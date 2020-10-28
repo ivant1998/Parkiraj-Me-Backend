@@ -4,9 +4,14 @@ plugins {
     id 'java'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+}
+
 group = 'hr.fer.littlegreen'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
 
 repositories {
     mavenCentral()

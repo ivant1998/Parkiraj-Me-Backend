@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.dao;
 
 import org.springframework.lang.NonNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Company extends User{
@@ -23,5 +24,19 @@ public class Company extends User{
     @NonNull
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Company company = (Company) o;
+        return address.equals(company.address) &&
+            name.equals(company.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address, name);
     }
 }

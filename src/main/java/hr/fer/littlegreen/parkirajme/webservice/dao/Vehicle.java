@@ -24,4 +24,5 @@ public class Vehicle{
     public UUID getOwnerId() {
         return ownerId;
     }
+
 }

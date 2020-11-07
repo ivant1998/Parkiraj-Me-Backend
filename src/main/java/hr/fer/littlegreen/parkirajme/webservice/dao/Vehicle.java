@@ -8,9 +8,9 @@ public class Vehicle{
     @NonNull
     private final String registrationNumber;
     @NonNull
-    private final UUID ownerId;
+    private final String ownerId;
 
-    public Vehicle(String registrationNumber, UUID ownerId) {
+    public Vehicle(String registrationNumber, String ownerId) {
         this.registrationNumber = registrationNumber;
         this.ownerId = ownerId;
     }
@@ -21,7 +21,7 @@ public class Vehicle{
     }
 
     @NonNull
-    public UUID getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 

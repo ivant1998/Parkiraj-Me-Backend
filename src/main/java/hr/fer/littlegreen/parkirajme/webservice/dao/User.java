@@ -1,25 +1,23 @@
 package hr.fer.littlegreen.parkirajme.webservice.dao;
 
-import hr.fer.littlegreen.parkirajme.webservice.QueryController;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public abstract class User {
     @NonNull
-    protected UUID id;
+    protected String id;
     @NonNull
     protected String email;
     @NonNull
     protected String password;
     @Nullable
-    protected char role;
+    protected String role;
     @NonNull
     protected String oib;
 
-    public User(@NonNull UUID id, @NonNull String email, @NonNull String password, char role, @NonNull String oib) {
+    public User(@NonNull String id, @NonNull String email, @NonNull String password, String role, @NonNull String oib) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -27,7 +25,7 @@ public abstract class User {
         this.oib = oib;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
@@ -39,7 +37,7 @@ public abstract class User {
         return password;
     }
 
-    public char getRole() {
+    public String getRole() {
         return role;
     }
 

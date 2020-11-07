@@ -1,6 +1,5 @@
 package hr.fer.littlegreen.parkirajme.webservice.queries;
 
-import hr.fer.littlegreen.parkirajme.webservice.QueryController;
 import hr.fer.littlegreen.parkirajme.webservice.dao.Administrator;
 import hr.fer.littlegreen.parkirajme.webservice.dao.Company;
 import hr.fer.littlegreen.parkirajme.webservice.dao.Person;
@@ -10,10 +9,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.UUID;
 
-public abstract class Query implements QueryController {
-    public static void queryUser(Connection con) throws SQLException {
+public abstract class Query{
+    /*public static void queryUser(Connection con) throws SQLException {
         String query = "select user_uuid, email, password_hash, role, oib from public.app_user";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
@@ -28,78 +26,97 @@ public abstract class Query implements QueryController {
             throw new SQLException();
         }
     }
-    public static void queryAdministrator(Connection con) throws SQLException {
+
+     */
+    public static Administrator queryAdministrator(Connection con) throws SQLException {
+        String email = null;
+        String password = null;
+        String role = null;
+        String oib = null;
+        String id = null;
         String query = "select user_uuid, email, password_hash, role, oib, administrator_uuid from public.administrator";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 //String id = rs.getString("user_uuid");
-                String email = rs.getString("email");
-                String password = rs.getString("password_hash");
-                String role = rs.getString("role");
-                String oib = rs.getString("oib");
-                String id = rs.getString("administrator_uuid");
-                Administrator administrator = new Administrator(id, email, password, role, oib);
+                email = rs.getString("email");
+                password = rs.getString("password_hash");
+                role = rs.getString("role");
+                oib = rs.getString("oib");
+                id = rs.getString("administrator_uuid");
             }
         } catch (SQLException e) {
             throw new SQLException();
         }
+        return new Administrator(id, email, password, role, oib);
     }
-    public static void queryPerson(Connection con) throws SQLException {
+    public static Person queryPerson(Connection con) throws SQLException {
+        String email = null;
+        String password = null;
+        String role = null;
+        String oib = null;
+        String id = null;
+        String firstName = null;
+        String lastName = null;
+        String creditCard = null;
         String query = "select user_uuid, email, password_hash, role, oib, person_uuid, first_name, last_name, credit_card_number from public.person";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 //String id = rs.getString("user_uuid");
-                String email = rs.getString("email");
-                String password = rs.getString("password_hash");
-                String role = rs.getString("role");
-                String oib = rs.getString("oib");
-                String id = rs.getString("person_uuid");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                String creditCard = rs.getString("credit_card_number");
-                Person person = new Person(id,email,password, role,oib, firstName, lastName, creditCard);
+                email = rs.getString("email");
+                password = rs.getString("password_hash");
+                role = rs.getString("role");
+                oib = rs.getString("oib");
+                id = rs.getString("person_uuid");
+                firstName = rs.getString("first_name");
+                lastName = rs.getString("last_name");
+                creditCard = rs.getString("credit_card_number");
             }
         } catch (SQLException e) {
             throw new SQLException();
         }
+        return new Person(id,email,password, role,oib, firstName, lastName, creditCard);
     }
-    public static void queryCompany(Connection con) throws SQLException {
+    public static Company queryCompany(Connection con) throws SQLException {
+        String email = null;
+        String password = null;
+        String role = null;
+        String oib = null;
+        String id = null;
+        String name = null;
+        String address = null;
         String query = "select user_uuid, email, password_hash, role, oib, company_uuid, name, headquarter_adress from public.app_user";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 //String id = rs.getString("user_uuid");
-                String email = rs.getString("email");
-                String password = rs.getString("password_hash");
-                String role = rs.getString("role");
-                String oib = rs.getString("oib");
-                String id = rs.getString("company_uuid");
-                String name = rs.getString("name");
-                String address = rs.getString("headquarter_adress");
-                Company company = new Company(id, email, password, role, oib, name, address);
+                email = rs.getString("email");
+                password = rs.getString("password_hash");
+                role = rs.getString("role");
+                oib = rs.getString("oib");
+                id = rs.getString("company_uuid");
+                name = rs.getString("name");
+                address = rs.getString("headquarter_adress");
             }
         } catch (SQLException e) {
             throw new SQLException();
         }
+        return new Company(id, email, password, role, oib, name, address);
     }
-    public static void queryVehicle(Connection con) throws SQLException {
+    public static Vehicle queryVehicle(Connection con) throws SQLException {
+        String registrationNumber = null;
+        String ownerID = null;
         String query = "select user_uuid, email, password_hash, role, oib, registration_number, owner_uuid from public.app_user";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                String id = rs.getString("user_uuid");
-                String email = rs.getString("email");
-                String password = rs.getString("password_hash");
-                String role = rs.getString("role");
-                String oib = rs.getString("oib");
-                String registrationNumber = rs.getString("registration_number");
-                String ownerID = rs.getString("owner_uuid");
-                Vehicle vehicle = new Vehicle(registrationNumber, ownerID);
+                registrationNumber = rs.getString("registration_number");
+                ownerID = rs.getString("owner_uuid");
             }
         } catch (SQLException e) {
             throw new SQLException();
         }
+        return new Vehicle(registrationNumber, ownerID);
     }
 }

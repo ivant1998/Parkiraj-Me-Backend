@@ -34,7 +34,7 @@ public abstract class Query{
         String role = null;
         String oib = null;
         String id = null;
-        String query = "select user_uuid, email, password_hash, role, oib, administrator_uuid from public.administrator";
+        String query = "select email, password_hash, role, oib, administrator_uuid from administrator join app_user on administrator_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -59,7 +59,7 @@ public abstract class Query{
         String firstName = null;
         String lastName = null;
         String creditCard = null;
-        String query = "select user_uuid, email, password_hash, role, oib, person_uuid, first_name, last_name, credit_card_number from public.person";
+        String query = "select email, password_hash, role, oib, person_uuid, first_name, last_name, credit_card_number from person join app_user on person_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -86,7 +86,7 @@ public abstract class Query{
         String id = null;
         String name = null;
         String address = null;
-        String query = "select user_uuid, email, password_hash, role, oib, company_uuid, name, headquarter_adress from public.app_user";
+        String query = "select email, password_hash, role, oib, company_uuid, name, headquarter_adress from app_user join company on company_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -107,7 +107,7 @@ public abstract class Query{
     public static Vehicle queryVehicle(Connection con) throws SQLException {
         String registrationNumber = null;
         String ownerID = null;
-        String query = "select user_uuid, email, password_hash, role, oib, registration_number, owner_uuid from public.app_user";
+        String query = "select email, password_hash, role, oib, registration_number, owner_uuid from person join vehicle on owner_uuid = person_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {

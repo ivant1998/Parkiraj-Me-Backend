@@ -12,8 +12,10 @@ public class TokenManagerImpl implements TokenManager {
 
     @NonNull
     private final Map<Token, String> storage;
+
     @NonNull
     private final SecureRandom secureRandom;
+
     @NonNull
     private final Base64.Encoder base64Encoder;
 
@@ -27,13 +29,15 @@ public class TokenManagerImpl implements TokenManager {
         this.base64Encoder = base64Encoder;
     }
 
-    public void generateToken(String id) {
+    @NonNull
+    public String generateToken(String id) {
         var currentDate = LocalDate.now();
         var endDate = currentDate.plusDays(30);
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         var token = base64Encoder.encodeToString(randomBytes);
         storage.put(new Token(token, endDate), id);
+        return token;
     }
 
     @Nullable

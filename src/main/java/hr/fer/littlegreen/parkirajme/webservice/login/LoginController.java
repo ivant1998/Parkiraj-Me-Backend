@@ -28,9 +28,9 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequestBody loginRequestBody) {
-        var user = databaseManager.checkLoginCredentials(loginRequestBody.getEmail(), loginRequestBody.getPassword());
-        if (user != null) {
-            var token = tokenManager.generateToken(user.getId());
+        var userId = databaseManager.checkLoginCredentials(loginRequestBody.getEmail(), loginRequestBody.getPassword());
+        if (userId != null) {
+            var token = tokenManager.generateToken(userId);
             return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
         }
         return new ResponseEntity<>(new LoginResponse(null), HttpStatus.UNAUTHORIZED);

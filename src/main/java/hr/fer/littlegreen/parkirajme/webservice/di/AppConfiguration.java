@@ -1,10 +1,13 @@
 package hr.fer.littlegreen.parkirajme.webservice.di;
 
 import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManagerImpl;
 import hr.fer.littlegreen.parkirajme.webservice.session.TokenManager;
 import hr.fer.littlegreen.parkirajme.webservice.session.TokenManagerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -23,7 +26,7 @@ public class AppConfiguration {
 
     @Bean
     public DatabaseManager provideDatabaseManager() {
-        return null;
+        return new DatabaseManagerImpl(providePasswordEncoder(), provideDatabaseConnection());
     }
 
     @Bean
@@ -40,5 +43,10 @@ public class AppConfiguration {
             System.out.println(e.getMessage());
         }
         return conn;
+    }
+
+    @Bean
+    public PasswordEncoder providePasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

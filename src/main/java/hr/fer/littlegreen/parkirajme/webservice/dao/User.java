@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 import java.util.Objects;
 
 public abstract class User {
+
     @NonNull
     protected String id;
     @NonNull

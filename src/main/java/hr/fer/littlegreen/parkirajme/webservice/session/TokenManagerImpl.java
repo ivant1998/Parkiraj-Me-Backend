@@ -3,12 +3,13 @@ package hr.fer.littlegreen.parkirajme.webservice.session;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Base64;
-import java.security.SecureRandom;
 import java.util.Map;
 
 public class TokenManagerImpl implements TokenManager {
+
     @NonNull
     private final Map<Token, String> storage;
     @NonNull
@@ -36,10 +37,10 @@ public class TokenManagerImpl implements TokenManager {
     }
 
     @Nullable
-    public String checkIfTokenValid(String token){
-        for(var entry : storage.entrySet()){
+    public String checkIfTokenValid(String token) {
+        for (var entry : storage.entrySet()) {
             var storedToken = entry.getKey();
-            if(storedToken.getToken().equals(token) && storedToken.getEndDate().compareTo(LocalDate.now()) >= 0){
+            if (storedToken.getToken().equals(token) && storedToken.getEndDate().compareTo(LocalDate.now()) >= 0) {
                 return entry.getValue();
             }
         }

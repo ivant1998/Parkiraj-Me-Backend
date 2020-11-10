@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class Token {
+
     @NonNull
     private final String token;
     @NonNull

@@ -10,7 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public abstract class Query{
+public abstract class Query {
+
     /*public static void queryUser(Connection con) throws SQLException {
         String query = "select user_uuid, email, password_hash, role, oib from public.app_user";
         try (Statement stmt = con.createStatement()) {
@@ -34,7 +35,9 @@ public abstract class Query{
         String role = null;
         String oib = null;
         String id = null;
-        String query = "select email, password_hash, role, oib, administrator_uuid from administrator join app_user on administrator_uuid = user_uuid";
+        String query
+            = "select email, password_hash, role, oib, administrator_uuid from administrator join app_user on "
+            + "administrator_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -50,6 +53,7 @@ public abstract class Query{
         }
         return new Administrator(id, email, password, role, oib);
     }
+
     public static Person queryPerson(Connection con) throws SQLException {
         String email = null;
         String password = null;
@@ -59,7 +63,9 @@ public abstract class Query{
         String firstName = null;
         String lastName = null;
         String creditCard = null;
-        String query = "select email, password_hash, role, oib, person_uuid, first_name, last_name, credit_card_number from person join app_user on person_uuid = user_uuid";
+        String query
+            = "select email, password_hash, role, oib, person_uuid, first_name, last_name, credit_card_number from "
+            + "person join app_user on person_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -76,8 +82,9 @@ public abstract class Query{
         } catch (SQLException e) {
             throw new SQLException();
         }
-        return new Person(id,email,password, role,oib, firstName, lastName, creditCard);
+        return new Person(id, email, password, role, oib, firstName, lastName, creditCard);
     }
+
     public static Company queryCompany(Connection con) throws SQLException {
         String email = null;
         String password = null;
@@ -86,7 +93,9 @@ public abstract class Query{
         String id = null;
         String name = null;
         String address = null;
-        String query = "select email, password_hash, role, oib, company_uuid, name, headquarter_adress from app_user join company on company_uuid = user_uuid";
+        String query
+            = "select email, password_hash, role, oib, company_uuid, name, headquarter_adress from app_user join "
+            + "company on company_uuid = user_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -104,10 +113,13 @@ public abstract class Query{
         }
         return new Company(id, email, password, role, oib, name, address);
     }
+
     public static Vehicle queryVehicle(Connection con) throws SQLException {
         String registrationNumber = null;
         String ownerID = null;
-        String query = "select email, password_hash, role, oib, registration_number, owner_uuid from person join vehicle on owner_uuid = person_uuid";
+        String query
+            = "select email, password_hash, role, oib, registration_number, owner_uuid from person join vehicle on "
+            + "owner_uuid = person_uuid";
         try (Statement stmt = con.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {

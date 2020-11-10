@@ -5,9 +5,9 @@ import org.springframework.lang.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
-public class Person extends User{
+public class Person extends User {
+
     @NonNull
     private final String firstName;
     @NonNull
@@ -17,7 +17,16 @@ public class Person extends User{
     @NonNull
     private final List<Vehicle> vehicleArray = new ArrayList<>();
 
-    public Person(String id, String email, String password, String role, String oib, String firstName, String lastName, String creditCard) {
+    public Person(
+        String id,
+        String email,
+        String password,
+        String role,
+        String oib,
+        String firstName,
+        String lastName,
+        String creditCard
+    ) {
         super(id, email, password, role, oib);
         this.firstName = firstName;
         this.lastName = lastName;
@@ -39,9 +48,9 @@ public class Person extends User{
         return creditCard;
     }
 
-    public void addNewVehicle(String registrationNumber){
-            Vehicle vehicle = new Vehicle(registrationNumber, this.id);
-            vehicleArray.add(vehicle);
+    public void addNewVehicle(String registrationNumber) {
+        Vehicle vehicle = new Vehicle(registrationNumber, this.id);
+        vehicleArray.add(vehicle);
     }
 
     @Override

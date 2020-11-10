@@ -4,7 +4,8 @@ import org.springframework.lang.NonNull;
 
 import java.util.Objects;
 
-public class Company extends User{
+public class Company extends User {
+
     @NonNull
     private final String address;
     @NonNull

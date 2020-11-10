@@ -2,9 +2,8 @@ package hr.fer.littlegreen.parkirajme.webservice.dao;
 
 import org.springframework.lang.NonNull;
 
-import java.util.UUID;
+public class Vehicle {
 
-public class Vehicle{
     @NonNull
     private final String registrationNumber;
     @NonNull

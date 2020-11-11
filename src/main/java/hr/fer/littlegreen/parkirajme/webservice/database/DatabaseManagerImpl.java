@@ -64,7 +64,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             + "VALUES ('"+user.getEmail()+"','"+user.getPassword()+"', 'p','"+user.getOIB()+"','"+"00000000000000000000000000000000"+"'); "
             + "INSERT INTO person (first_name, last_name, credit_card_number, person_uuid)\n"
             + "VALUES ('"+user.getName()+"','"+user.getSurname()+"','"+user.getCreditcard()+"','"+"00000000000000000000000000000000"+"'); "
-            + "INSERT INTO vehicle (registration_number, owner_uuid)\n"
+            + "INSERT INTO vehicle (registration_number, person_uuid)\n"
             + "VALUES ('"+user.getRegPlate()+"','"+"00000000000000000000000000000000"+"'); "
             //+ "ROLLBACK TRANSACTION\n"
             + "COMMIT TRANSACTION;";

@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 public class DatabaseManagerImpl implements DatabaseManager {
 
@@ -42,15 +43,21 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public void registerCompany(RegisterCompanyRequestBody company) {
-        String query = "insert into app_user (email, password_hash, role, oib, user_uuid) "
-        + "values ('" + company.getEmail() + "', '" + company.getPassword() + "', 'c', '" + company.getOib() + "', '" + "uuid" + "');\n"
-        + "insert into company (name, headquarter_address, company_uuid) "
-            + "values ('" + company.getName() + "', '" + company.getAddress() + "', '" + "uuid" + "');";
+    public String registerCompany(RegisterCompanyRequestBody company) {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String query = "BEGIN TRANSACTION;\n"
+            + "insert into app_user (email, password_hash, role, oib, user_uuid) "
+            + "values ('" + company.getEmail() + "', '" + company.getPassword() + "', 'c', '" + company.getOib()
+            + "', '" + uuid + "');\n"
+            + "insert into company (name, headquarter_address, company_uuid) "
+            + "values ('" + company.getName() + "', '" + company.getAddress() + "', '" + uuid + "');"
+            + "END TRANSACTION;";
         try (Statement stmt = databaseConnection.createStatement()) {
             stmt.executeUpdate(query);
+            return uuid;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

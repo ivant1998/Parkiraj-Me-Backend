@@ -10,5 +10,5 @@ public interface DatabaseManager {
     String checkLoginCredentials(@NonNull String email, @NonNull String password);
 
     @Nullable
-    void registerCompany(@NonNull RegisterCompanyRequestBody registerCompanyRequestBody);
+    String registerCompany(@NonNull RegisterCompanyRequestBody registerCompanyRequestBody);
 }

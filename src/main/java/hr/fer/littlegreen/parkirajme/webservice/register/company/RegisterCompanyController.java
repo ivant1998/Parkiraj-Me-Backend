@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 public class RegisterCompanyController {
 
@@ -27,8 +26,12 @@ public class RegisterCompanyController {
 
     @PostMapping("/register/company")
     public ResponseEntity<RegisterCompanyResponse> registerCompany(@RequestBody RegisterCompanyRequestBody registerCompanyRequestBody) {
-        databaseManager.registerCompany(registerCompanyRequestBody);
-        return new ResponseEntity<>(new RegisterCompanyResponse(null), HttpStatus.CREATED);
+        String userId = databaseManager.registerCompany(registerCompanyRequestBody);
+        if (userId != null) {
+            var token = tokenManager.generateToken(userId);
+            return new ResponseEntity<>(new RegisterCompanyResponse(token), HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(new RegisterCompanyResponse(null), HttpStatus.CONFLICT);
     }
 
 }

@@ -21,8 +21,10 @@ public class RegisterCompanyRequestBody {
     @NonNull
     private final String password;
 
-    public RegisterCompanyRequestBody ( @NonNull String OIB, @NonNull String name, @NonNull String address,
-                                        @NonNull String email, @NonNull String password) {
+    public RegisterCompanyRequestBody(
+        @NonNull String OIB, @NonNull String name, @NonNull String address,
+        @NonNull String email, @NonNull String password
+    ) {
         this.OIB = OIB;
         this.name = name;
         this.address = address;

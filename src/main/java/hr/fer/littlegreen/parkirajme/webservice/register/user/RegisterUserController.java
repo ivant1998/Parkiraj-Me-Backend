@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.register.company;
+package hr.fer.littlegreen.parkirajme.webservice.register.user;
 
 import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.session.TokenManager;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class RegisterCompanyController {
+public class RegisterUserController {
 
     @NonNull
     private final DatabaseManager databaseManager;
@@ -18,7 +18,7 @@ public class RegisterCompanyController {
     @NonNull
     private final TokenManager tokenManager;
 
-    public RegisterCompanyController(
+    public RegisterUserController(
         @NonNull DatabaseManager databaseManager,
         @NonNull TokenManager tokenManager
     ) {
@@ -26,16 +26,13 @@ public class RegisterCompanyController {
         this.tokenManager = tokenManager;
     }
 
-    @PostMapping("/register/company")
-    public ResponseEntity<RegisterCompanyResponse> registerCompany(
-        @RequestBody RegisterCompanyRequestBody registerCompanyRequestBody
-    ) {
-        String userId = databaseManager.registerCompany(registerCompanyRequestBody);
+    @PostMapping("/register/user")
+    public ResponseEntity<RegisterUserResponse> regUser(@RequestBody RegisterUserRequestBody regUserReqBody){
+        var userId = databaseManager.registerUser(regUserReqBody);
         if (userId != null) {
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterCompanyResponse(token), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterUserResponse(token), HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(new RegisterCompanyResponse(null), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new RegisterUserResponse(null), HttpStatus.CONFLICT);
     }
-
 }

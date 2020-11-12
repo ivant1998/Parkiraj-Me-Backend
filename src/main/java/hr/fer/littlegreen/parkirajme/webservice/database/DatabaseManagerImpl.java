@@ -1,5 +1,6 @@
 package hr.fer.littlegreen.parkirajme.webservice.database;
 
+import hr.fer.littlegreen.parkirajme.webservice.register.company.RegisterCompanyRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -38,5 +39,19 @@ public class DatabaseManagerImpl implements DatabaseManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void registerCompany(RegisterCompanyRequestBody registerCompanyRequestBody) {
+        String query = "insert into app_user  (email, password_hash, role, oib, user_uuid) "
+        + "values (" + registerCompanyRequestBody.getEmail() + ", " + registerCompanyRequestBody.getPassword() + ", "
+        + "p, " + registerCompanyRequestBody.getOib() + ", " + uuid + ");"
+        + "insert into company (name, headquarter_address, company_uuid) "
+            + "values (" + registerCompanyRequestBody.getName() + ", " + registerCompanyRequestBody.getAddress() + "," + uuid + ");";
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

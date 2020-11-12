@@ -9,8 +9,9 @@ public interface DatabaseManager {
     @Nullable
     String checkLoginCredentials(@NonNull String email, @NonNull String password);
 
-    @Nullable
-    String checkUserExists(@NonNull String email, @NonNull String oib);
+    /*@Nullable
+    String checkUserExists(@NonNull String email, @NonNull String oib);*/
 
-    void registerUser(@NonNull RegisterUserRequestBody user);
+    @Nullable
+    String registerUser(@NonNull RegisterUserRequestBody user);
 }

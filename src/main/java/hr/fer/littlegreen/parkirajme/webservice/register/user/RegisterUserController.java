@@ -28,10 +28,10 @@ public class RegisterUserController {
 
     @PostMapping("/register/user")
     public ResponseEntity<RegisterUserResponse> regUser(@RequestBody RegisterUserRequestBody regUserReqBody){
-        var userId = databaseManager.checkUserExists(regUserReqBody.getEmail(),regUserReqBody.getOIB());
-        if (userId == null) {
-            databaseManager.registerUser(regUserReqBody);
-            return new ResponseEntity<>(new RegisterUserResponse(null), HttpStatus.CREATED);
+        var userId = databaseManager.registerUser(regUserReqBody);
+        if (userId != null) {
+            var token = tokenManager.generateToken(userId);
+            return new ResponseEntity<>(new RegisterUserResponse(token), HttpStatus.CREATED);
         }
         return new ResponseEntity<>(new RegisterUserResponse(null), HttpStatus.CONFLICT);
     }

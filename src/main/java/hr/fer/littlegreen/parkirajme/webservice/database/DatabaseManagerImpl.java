@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 public class DatabaseManagerImpl implements DatabaseManager {
 
@@ -41,7 +42,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
-    @Override
+    /*@Override
     public String checkUserExists(@NonNull String email,@NonNull String oib) {
         String query
             = "select user_uuid from app_user where email = '" + email +"' or oib = '" + oib+"';" ;
@@ -54,24 +55,26 @@ public class DatabaseManagerImpl implements DatabaseManager {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 
     @Override
-    public void registerUser(@NonNull RegisterUserRequestBody user) {
+    public String registerUser(@NonNull RegisterUserRequestBody user) {
+        String uuid = UUID.randomUUID().toString().replace("-","");
         String query
             = "BEGIN TRANSACTION;\n"
             + "INSERT INTO app_user (email, password_hash, role, oib, user_uuid)\n"
-            + "VALUES ('"+user.getEmail()+"','"+user.getPassword()+"', 'p','"+user.getOIB()+"','"+"00000000000000000000000000000000"+"'); "
+            + "VALUES ('"+user.getEmail()+"','"+passwordEncoder.encode(user.getPassword())+"', 'p','"+user.getOIB()+"','"+uuid+"'); "
             + "INSERT INTO person (first_name, last_name, credit_card_number, person_uuid)\n"
-            + "VALUES ('"+user.getName()+"','"+user.getSurname()+"','"+user.getCreditcard()+"','"+"00000000000000000000000000000000"+"'); "
+            + "VALUES ('"+user.getName()+"','"+user.getSurname()+"','"+user.getCreditcard()+"','"+uuid+"'); "
             + "INSERT INTO vehicle (registration_number, person_uuid)\n"
-            + "VALUES ('"+user.getRegPlate()+"','"+"00000000000000000000000000000000"+"'); "
-            //+ "ROLLBACK TRANSACTION\n"
+            + "VALUES ('"+user.getRegPlate()+"','"+uuid+"'); "
             + "COMMIT TRANSACTION;";
         try (Statement stmt = databaseConnection.createStatement()) {
             stmt.executeUpdate(query);
+            return uuid;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

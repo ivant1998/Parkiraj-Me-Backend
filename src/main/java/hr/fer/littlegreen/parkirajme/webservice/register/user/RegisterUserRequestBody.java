@@ -86,11 +86,16 @@ public class RegisterUserRequestBody {
         if (o == null || getClass() != o.getClass()) { return false; }
         RegisterUserRequestBody that = (RegisterUserRequestBody) o;
         return email.equals(that.email) &&
-            OIB.equals(that.OIB);
+            password.equals(that.password) &&
+            name.equals(that.name) &&
+            surname.equals(that.surname) &&
+            OIB.equals(that.OIB) &&
+            regPlate.equals(that.regPlate) &&
+            creditcard.equals(that.creditcard);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, OIB);
+        return Objects.hash(email, password, name, surname, OIB, regPlate, creditcard);
     }
 }

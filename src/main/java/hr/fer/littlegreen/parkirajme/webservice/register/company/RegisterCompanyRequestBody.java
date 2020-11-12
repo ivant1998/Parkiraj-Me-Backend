@@ -48,15 +48,17 @@ public class RegisterCompanyRequestBody {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!(o instanceof RegisterCompanyRequestBody)) { return false; }
         RegisterCompanyRequestBody that = (RegisterCompanyRequestBody) o;
-        return email.equals(that.email) &&
-            OIB.equals(that.OIB);
+        return OIB.equals(that.OIB) &&
+            getName().equals(that.getName()) &&
+            getAddress().equals(that.getAddress()) &&
+            getEmail().equals(that.getEmail()) &&
+            getPassword().equals(that.getPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, OIB);
+        return Objects.hash(OIB, getName(), getAddress(), getEmail(), getPassword());
     }
-
 }

@@ -42,12 +42,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public void registerCompany(RegisterCompanyRequestBody registerCompanyRequestBody) {
-        String query = "insert into app_user  (email, password_hash, role, oib, user_uuid) "
-        + "values (" + registerCompanyRequestBody.getEmail() + ", " + registerCompanyRequestBody.getPassword() + ", "
-        + "p, " + registerCompanyRequestBody.getOib() + ", " + uuid + ");"
+    public void registerCompany(RegisterCompanyRequestBody company) {
+        String query = "insert into app_user (email, password_hash, role, oib, user_uuid) "
+        + "values ('" + company.getEmail() + "', '" + company.getPassword() + "', 'c', '" + company.getOib() + "', '" + "uuid" + "');\n"
         + "insert into company (name, headquarter_address, company_uuid) "
-            + "values (" + registerCompanyRequestBody.getName() + ", " + registerCompanyRequestBody.getAddress() + "," + uuid + ");";
+            + "values ('" + company.getName() + "', '" + company.getAddress() + "', '" + "uuid" + "');";
         try (Statement stmt = databaseConnection.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {

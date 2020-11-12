@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.register.user;
 
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RegisterUserRequestBody {
@@ -22,7 +23,7 @@ public class RegisterUserRequestBody {
     private final String OIB;
 
     @NonNull
-    private final String regPlate;
+    private final List<String> regPlates;
 
     @NonNull
     private final String creditcard;
@@ -33,7 +34,7 @@ public class RegisterUserRequestBody {
         @NonNull String name,
         @NonNull String surname,
         @NonNull String OIB,
-        @NonNull String regPlate,
+        @NonNull List<String> regPlates,
         @NonNull String creditcard
     ) {
         this.email = email;
@@ -41,7 +42,7 @@ public class RegisterUserRequestBody {
         this.name = name;
         this.surname = surname;
         this.OIB = OIB;
-        this.regPlate = regPlate;
+        this.regPlates = regPlates;
         this.creditcard = creditcard;
     }
 
@@ -71,8 +72,8 @@ public class RegisterUserRequestBody {
     }
 
     @NonNull
-    public String getRegPlate() {
-        return regPlate;
+    public List<String> getRegPlates() {
+        return regPlates;
     }
 
     @NonNull
@@ -90,12 +91,12 @@ public class RegisterUserRequestBody {
             name.equals(that.name) &&
             surname.equals(that.surname) &&
             OIB.equals(that.OIB) &&
-            regPlate.equals(that.regPlate) &&
+            regPlates.equals(that.regPlates) &&
             creditcard.equals(that.creditcard);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password, name, surname, OIB, regPlate, creditcard);
+        return Objects.hash(email, password, name, surname, OIB, regPlates, creditcard);
     }
 }

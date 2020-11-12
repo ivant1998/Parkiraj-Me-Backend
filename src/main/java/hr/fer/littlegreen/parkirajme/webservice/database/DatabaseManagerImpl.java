@@ -29,12 +29,20 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public String checkLoginCredentials(String email, String password) {
         String query
-            = "select user_uuid from app_user where email = " + email + " and password_hash = "
-            + passwordEncoder.encode(password);
-        try (Statement stmt = databaseConnection.createStatement()) {
+            = "select user_uuid, password_hash from app_user where email = '" + email + "';";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
             ResultSet rs = stmt.executeQuery(query);
             if (rs.first()) {
-                return rs.getString("user_uuid");
+                String uuid = rs.getString("user_uuid");
+                String passwordHash = rs.getString("password_hash");
+                if (passwordEncoder.matches(password, passwordHash)) {
+                    return uuid;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,7 +55,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String query = "BEGIN TRANSACTION;\n"
             + "insert into app_user (email, password_hash, role, oib, user_uuid) "
-            + "values ('" + company.getEmail() + "', '" + company.getPassword() + "', 'c', '" + company.getOib()
+            + "values ('" + company.getEmail() + "', '" + passwordEncoder.encode(company.getPassword()) + "', 'c', '"
+            + company.getOib()
             + "', '" + uuid + "');\n"
             + "insert into company (name, headquarter_address, company_uuid) "
             + "values ('" + company.getName() + "', '" + company.getAddress() + "', '" + uuid + "');"

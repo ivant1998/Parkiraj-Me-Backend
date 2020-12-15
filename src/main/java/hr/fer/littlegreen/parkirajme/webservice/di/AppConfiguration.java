@@ -1,9 +1,9 @@
 package hr.fer.littlegreen.parkirajme.webservice.di;
 
-import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManagerImpl;
-import hr.fer.littlegreen.parkirajme.webservice.session.TokenManager;
-import hr.fer.littlegreen.parkirajme.webservice.session.TokenManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
+import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManagerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

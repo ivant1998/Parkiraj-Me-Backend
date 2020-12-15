@@ -1,7 +1,7 @@
-package hr.fer.littlegreen.parkirajme.webservice.register.user;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.register.user;
 
-import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.session.TokenManager;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;

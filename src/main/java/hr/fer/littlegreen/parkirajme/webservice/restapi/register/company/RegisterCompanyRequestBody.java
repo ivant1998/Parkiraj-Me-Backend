@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.register.company;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.register.company;
 
 import org.springframework.lang.NonNull;
 

@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.session;
+package hr.fer.littlegreen.parkirajme.webservice.domain.session;
 
 import org.springframework.lang.NonNull;
 

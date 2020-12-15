@@ -1,7 +1,7 @@
-package hr.fer.littlegreen.parkirajme.webservice.database;
+package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
-import hr.fer.littlegreen.parkirajme.webservice.register.company.RegisterCompanyRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.register.user.RegisterUserRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 

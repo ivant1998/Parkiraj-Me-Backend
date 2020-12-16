@@ -9,20 +9,32 @@ public class RegisterCompanyResponse {
     @Nullable
     private final String token;
 
-    public RegisterCompanyResponse(@Nullable String token) { this.token = token; }
-
     @Nullable
-    public final String getToken() { return token; }
+    private final String id;
+
+    public RegisterCompanyResponse(@Nullable String token, @Nullable String id) {
+        this.token = token;
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         RegisterCompanyResponse that = (RegisterCompanyResponse) o;
-        return token.equals(that.token);
+        return Objects.equals(token, that.token) && Objects.equals(id, that.id);
     }
 
     @Override
-    public int hashCode() { return Objects.hash(token); }
+    public int hashCode() {
+        return Objects.hash(token, id);
+    }
 
+    @Nullable
+    public final String getToken() { return token; }
+
+    @Nullable
+    public String getId() {
+        return id;
+    }
 }

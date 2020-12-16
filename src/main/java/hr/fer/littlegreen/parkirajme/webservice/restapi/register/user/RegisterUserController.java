@@ -31,8 +31,8 @@ public class RegisterUserController {
         var userId = databaseManager.registerUser(regUserReqBody);
         if (userId != null) {
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterUserResponse(token), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterUserResponse(token, userId), HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(new RegisterUserResponse(null), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new RegisterUserResponse(null, null), HttpStatus.CONFLICT);
     }
 }

@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.domain.models;
 
 import org.springframework.lang.NonNull;
 
+import java.util.Date;
 import java.util.List;
 
 public final class Person extends User {
@@ -16,23 +17,27 @@ public final class Person extends User {
     private final String creditCard;
 
     @NonNull
+    private final Date creditCardExpirationDate;
+
+    @NonNull
     private final List<Vehicle> vehicles;
 
     public Person(
         @NonNull String id,
         @NonNull String email,
-        @NonNull String password,
         @NonNull String role,
         @NonNull String oib,
         @NonNull String firstName,
         @NonNull String lastName,
         @NonNull String creditCard,
+        @NonNull Date creditCardExpirationDate,
         @NonNull List<Vehicle> vehicles
     ) {
-        super(id, email, password, role, oib);
+        super(id, email, role, oib);
         this.firstName = firstName;
         this.lastName = lastName;
         this.creditCard = creditCard;
+        this.creditCardExpirationDate = creditCardExpirationDate;
         this.vehicles = vehicles;
     }
 

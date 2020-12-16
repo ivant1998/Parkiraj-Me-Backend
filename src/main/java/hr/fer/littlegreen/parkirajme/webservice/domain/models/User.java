@@ -13,9 +13,6 @@ public abstract class User {
     protected String email;
 
     @NonNull
-    protected String password;
-
-    @NonNull
     protected String role;
 
     @NonNull
@@ -24,13 +21,11 @@ public abstract class User {
     public User(
         @NonNull String id,
         @NonNull String email,
-        @NonNull String password,
         @NonNull String role,
         @NonNull String oib
     ) {
         this.id = id;
         this.email = email;
-        this.password = password;
         this.role = role;
         this.oib = oib;
     }
@@ -43,11 +38,6 @@ public abstract class User {
     @NonNull
     public String getEmail() {
         return email;
-    }
-
-    @NonNull
-    public String getPassword() {
-        return password;
     }
 
     @NonNull

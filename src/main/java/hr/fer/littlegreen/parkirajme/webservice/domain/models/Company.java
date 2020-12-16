@@ -13,13 +13,12 @@ public final class Company extends User {
     public Company(
         @NonNull String id,
         @NonNull String email,
-        @NonNull String password,
         @NonNull String role,
         @NonNull String oib,
         @NonNull String address,
         @NonNull String name
     ) {
-        super(id, email, password, role, oib);
+        super(id, email, role, oib);
         this.address = address;
         this.name = name;
     }

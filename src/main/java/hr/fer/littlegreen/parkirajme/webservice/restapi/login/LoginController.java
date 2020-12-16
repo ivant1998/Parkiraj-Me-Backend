@@ -28,11 +28,11 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequestBody loginRequestBody) {
-        var userId = databaseManager.checkLoginCredentials(loginRequestBody.getEmail(), loginRequestBody.getPassword());
-        if (userId != null) {
-            var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
+        var user = databaseManager.checkLoginCredentials(loginRequestBody.getEmail(), loginRequestBody.getPassword());
+        if (user != null) {
+            var token = tokenManager.generateToken(user.getId());
+            return new ResponseEntity<>(new LoginResponse(token, user), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new LoginResponse(null), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new LoginResponse(null, null), HttpStatus.UNAUTHORIZED);
     }
 }

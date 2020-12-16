@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.register.user;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.register.user;
 
 import org.springframework.lang.NonNull;
 

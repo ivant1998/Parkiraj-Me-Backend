@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.dao;
+package hr.fer.littlegreen.parkirajme.webservice.domain.models;
 
 import org.springframework.lang.NonNull;
 

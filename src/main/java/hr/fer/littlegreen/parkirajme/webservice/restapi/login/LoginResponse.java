@@ -1,15 +1,15 @@
-package hr.fer.littlegreen.parkirajme.webservice.register.user;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.login;
 
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
-public class RegisterUserResponse {
+public class LoginResponse {
 
     @Nullable
     private final String token;
 
-    public RegisterUserResponse(@Nullable String token) {
+    public LoginResponse(@Nullable String token) {
         this.token = token;
     }
 
@@ -22,7 +22,7 @@ public class RegisterUserResponse {
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        RegisterUserResponse that = (RegisterUserResponse) o;
+        LoginResponse that = (LoginResponse) o;
         return token.equals(that.token);
     }
 

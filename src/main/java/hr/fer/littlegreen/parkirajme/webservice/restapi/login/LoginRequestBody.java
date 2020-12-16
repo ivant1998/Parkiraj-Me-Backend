@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.login;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.login;
 
 import org.springframework.lang.NonNull;
 

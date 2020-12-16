@@ -1,14 +1,18 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public class DatabaseManagerImpl implements DatabaseManager {
@@ -94,5 +98,33 @@ public class DatabaseManagerImpl implements DatabaseManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public List<ParkingObject> getParkingObjects() {
+        List<ParkingObject> list = new LinkedList<>();
+        String query = "select * from parking_object;";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String id = rs.getString("object_uuid");
+                String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                String address = rs.getString("address");
+                String name = rs.getString("name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

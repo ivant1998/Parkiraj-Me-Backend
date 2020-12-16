@@ -92,19 +92,12 @@ public final class ParkingObject {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         ParkingObject that = (ParkingObject) o;
-        return freeSlots == that.freeSlots &&
-            price == that.price &&
-            id.equals(that.id) &&
-            companyId.equals(that.companyId) &&
-            address.equals(that.address) &&
-            name.equals(that.name) &&
-            latitude.equals(that.latitude) &&
-            longitude.equals(that.longitude);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, companyId, freeSlots, price, address, name, latitude, longitude);
+        return Objects.hash(id);
     }
 
 }

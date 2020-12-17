@@ -124,7 +124,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             var vehicles = new ArrayList<Vehicle>();
             if (resultSet.next()) {
                 String registrationNumber = resultSet.getString("registration_number");
-                vehicles.add(new Vehicle(registrationNumber, personUuid));
+                vehicles.add(new Vehicle(registrationNumber));
             }
             return vehicles;
         } catch (SQLException e) {

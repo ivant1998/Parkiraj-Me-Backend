@@ -17,6 +17,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,7 +101,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                     firstName,
                     lastName,
                     creditCardNumber,
-                    creditCardExpirationDate,
+                    YearMonth.from(creditCardExpirationDate.toLocalDate()),
                     getVehicles(userUuid)
                 );
             }

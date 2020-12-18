@@ -33,9 +33,9 @@ public class RegisterCompanyController {
         String userId = databaseManager.registerCompany(registerCompanyRequestBody);
         if (userId != null) {
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterCompanyResponse(token), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterCompanyResponse(token, userId), HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(new RegisterCompanyResponse(null), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(new RegisterCompanyResponse(null, null), HttpStatus.CONFLICT);
     }
 
 }

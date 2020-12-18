@@ -9,12 +9,8 @@ public final class Vehicle {
     @NonNull
     private final String registrationNumber;
 
-    @NonNull
-    private final String ownerId;
-
-    public Vehicle(@NonNull String registrationNumber, @NonNull String ownerId) {
+    public Vehicle(@NonNull String registrationNumber) {
         this.registrationNumber = registrationNumber;
-        this.ownerId = ownerId;
     }
 
     @NonNull
@@ -22,22 +18,16 @@ public final class Vehicle {
         return registrationNumber;
     }
 
-    @NonNull
-    public String getOwnerId() {
-        return ownerId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         Vehicle vehicle = (Vehicle) o;
-        return registrationNumber.equals(vehicle.registrationNumber) &&
-            ownerId.equals(vehicle.ownerId);
+        return registrationNumber.equals(vehicle.registrationNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(registrationNumber, ownerId);
+        return Objects.hash(registrationNumber);
     }
 }

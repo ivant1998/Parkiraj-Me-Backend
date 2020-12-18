@@ -1,6 +1,11 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Administrator;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Company;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
 import org.springframework.lang.NonNull;
@@ -8,14 +13,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("SqlResolve")
 public class DatabaseManagerImpl implements DatabaseManager {
+
+    private static final String ROLE_PERSON = "p";
+    private static final String ROLE_COMPANY = "c";
+    private static final String ROLE_ADMINISTRATOR = "a";
 
     @NonNull
     private final PasswordEncoder passwordEncoder;
@@ -32,27 +45,117 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String checkLoginCredentials(@NonNull String email, @NonNull String password) {
-        String query
-            = "select user_uuid, password_hash from app_user where email = '" + email + "';";
+    public User checkLoginCredentials(@NonNull String inputEmail, @NonNull String inputPassword) {
+        var query = "SELECT * FROM app_user WHERE email = '%s';"
+            .formatted(inputEmail);
         try (
-            Statement stmt = databaseConnection.createStatement(
+            var statement = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
-            if (rs.first()) {
-                String uuid = rs.getString("user_uuid");
-                String passwordHash = rs.getString("password_hash");
-                if (passwordEncoder.matches(password, passwordHash)) {
-                    return uuid;
+            var resultSet = statement.executeQuery(query);
+            if (resultSet.first()) {
+                String userUuid = resultSet.getString("user_uuid");
+                String email = resultSet.getString("email");
+                String passwordHash = resultSet.getString("password_hash");
+                String role = resultSet.getString("role");
+                String oib = resultSet.getString("oib");
+                if (passwordEncoder.matches(inputPassword, passwordHash)) {
+                    switch (role) {
+                    case ROLE_PERSON:
+                        return getPerson(userUuid, email, role, oib);
+                    case ROLE_COMPANY:
+                        return getCompany(userUuid, email, role, oib);
+                    case ROLE_ADMINISTRATOR:
+                        return getAdministrator(userUuid, email, role, oib);
+                    }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private Person getPerson(String userUuid, String email, String role, String oib) {
+        var query = "SELECT * FROM person WHERE person_uuid = '%s';"
+            .formatted(userUuid);
+        try (
+            var statement = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            var resultSet = statement.executeQuery(query);
+            if (resultSet.first()) {
+                String firstName = resultSet.getString("first_name");
+                String lastName = resultSet.getString("last_name");
+                String creditCardNumber = resultSet.getString("credit_card_number");
+                Date creditCardExpirationDate = resultSet.getDate("credit_card_expiration_date");
+                return new Person(
+                    userUuid,
+                    email,
+                    role,
+                    oib,
+                    firstName,
+                    lastName,
+                    creditCardNumber,
+                    YearMonth.from(creditCardExpirationDate.toLocalDate()),
+                    getVehicles(userUuid)
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<Vehicle> getVehicles(String personUuid) {
+        var query = "SELECT registration_number FROM vehicle WHERE person_uuid = '%s';"
+            .formatted(personUuid);
+        try (
+            var statement = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            var resultSet = statement.executeQuery(query);
+            var vehicles = new ArrayList<Vehicle>();
+            if (resultSet.next()) {
+                String registrationNumber = resultSet.getString("registration_number");
+                vehicles.add(new Vehicle(registrationNumber));
+            }
+            return vehicles;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return List.of();
+    }
+
+    private Company getCompany(String userUuid, String email, String role, String oib) {
+        var query = "SELECT * FROM company WHERE company_uuid = '%s';"
+            .formatted(userUuid);
+        try (
+            var statement = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            var resultSet = statement.executeQuery(query);
+            if (resultSet.first()) {
+                String name = resultSet.getString("name");
+                String headquarterAddress = resultSet.getString("headquarter_address");
+                return new Company(userUuid, email, role, oib, headquarterAddress, name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Administrator getAdministrator(String userUuid, String email, String role, String oib) {
+        return new Administrator(userUuid, email, role, oib);
     }
 
     @Override
@@ -81,7 +184,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String registerCompany(RegisterCompanyRequestBody company) {
+    public String registerCompany(@NonNull RegisterCompanyRequestBody company) {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String query = "BEGIN TRANSACTION;\n"
             + "insert into app_user (email, password_hash, role, oib, user_uuid) "

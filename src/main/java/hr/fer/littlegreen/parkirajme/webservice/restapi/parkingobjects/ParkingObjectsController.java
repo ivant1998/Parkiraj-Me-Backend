@@ -13,9 +13,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.pow;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
 
 @RestController
 public class ParkingObjectsController {
@@ -35,30 +37,34 @@ public class ParkingObjectsController {
         return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
     }
 
-    @GetMapping("/closestParkingObject?lat=x&long=y")
-    public ResponseEntity<ParkingObject> parkingObjects(
-        @RequestParam BigDecimal latitude,
-        @RequestParam BigDecimal longitude
+    @GetMapping("/closestParkingObject")
+    public ResponseEntity<ParkingObject> closestParkingObject(
+        @RequestParam("lat") BigDecimal latitude,
+        @RequestParam("long") BigDecimal longitude
     ) {
         var objects = databaseManager.getParkingObjects();
         if (objects == null) {
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
         ParkingObject min = objects.get(0);
-        var currentPos = sqrt(
-            pow(abs(objects.get(0).getLatitude().doubleValue() - latitude.doubleValue()), 2) + pow(abs(
-                objects.get(0).getLongitude().doubleValue() - longitude.doubleValue()), 2));
-        for (var object : objects) {
-            if (currentPos > sqrt(
-                pow(abs(object.getLatitude().doubleValue() - latitude.doubleValue()), 2) + pow(abs(
-                    object.getLongitude().doubleValue() - longitude.doubleValue()), 2))) {
+        var curr = getDistanceFromLatLonInKm(latitude, longitude, min);
+        for (ParkingObject object : objects) {
+            if (curr > getDistanceFromLatLonInKm(latitude, longitude, object)) {
                 min = object;
-                currentPos = sqrt(
-                    pow(abs(object.getLatitude().doubleValue() - latitude.doubleValue()), 2) + pow(abs(
-                        object.getLongitude().doubleValue() - longitude.doubleValue()), 2));
+                curr = getDistanceFromLatLonInKm(latitude, longitude, object);
             }
         }
         return new ResponseEntity<>(min, HttpStatus.OK);
+    }
+
+    private double getDistanceFromLatLonInKm(BigDecimal latitude, BigDecimal longitude, ParkingObject object) {
+        var R = 6731;
+        var dLat = toRadians(object.getLatitude().doubleValue() - latitude.doubleValue());
+        var dLong = toRadians(object.getLongitude().doubleValue() - longitude.doubleValue());
+        var a = sin(dLat / 2) * sin(dLat / 2) + cos(toRadians(latitude.doubleValue())) *
+            cos(toRadians(object.getLatitude().doubleValue())) * sin(dLong / 2) * sin(dLat / 2);
+        var c = 2 * atan2(sqrt(a), sqrt(1 - a));
+        return R * c;
     }
 
 }

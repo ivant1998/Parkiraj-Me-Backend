@@ -26,7 +26,10 @@ public class RegisterUserRequestBody {
     private final List<String> regPlates;
 
     @NonNull
-    private final String creditcard;
+    private final String creditCard;
+
+    @NonNull
+    private final String creditCardExpirationDate;
 
     public RegisterUserRequestBody(
         @NonNull String email,
@@ -35,7 +38,8 @@ public class RegisterUserRequestBody {
         @NonNull String surname,
         @NonNull String OIB,
         @NonNull List<String> regPlates,
-        @NonNull String creditcard
+        @NonNull String creditCard,
+        @NonNull String creditCardExpirationDate
     ) {
         this.email = email;
         this.password = password;
@@ -43,7 +47,8 @@ public class RegisterUserRequestBody {
         this.surname = surname;
         this.OIB = OIB;
         this.regPlates = regPlates;
-        this.creditcard = creditcard;
+        this.creditCard = creditCard;
+        this.creditCardExpirationDate = creditCardExpirationDate;
     }
 
     @NonNull
@@ -77,8 +82,13 @@ public class RegisterUserRequestBody {
     }
 
     @NonNull
-    public String getCreditcard() {
-        return creditcard;
+    public String getCreditCard() {
+        return creditCard;
+    }
+
+    @NonNull
+    public String getCreditCardExpirationDate() {
+        return creditCardExpirationDate;
     }
 
     @Override
@@ -92,11 +102,12 @@ public class RegisterUserRequestBody {
             surname.equals(that.surname) &&
             OIB.equals(that.OIB) &&
             regPlates.equals(that.regPlates) &&
-            creditcard.equals(that.creditcard);
+            creditCard.equals(that.creditCard) &&
+            creditCardExpirationDate.equals(that.creditCardExpirationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password, name, surname, OIB, regPlates, creditcard);
+        return Objects.hash(email, password, name, surname, OIB, regPlates, creditCard, creditCardExpirationDate);
     }
 }

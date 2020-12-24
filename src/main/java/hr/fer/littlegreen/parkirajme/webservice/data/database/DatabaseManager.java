@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
 import org.springframework.lang.NonNull;
@@ -22,4 +23,7 @@ public interface DatabaseManager {
 
     @Nullable
     List<ParkingObject> getParkingObjects();
+
+    @Nullable
+    String addParkingObject(@NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody);
 }

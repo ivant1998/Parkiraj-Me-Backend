@@ -6,6 +6,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
 import org.springframework.lang.NonNull;
@@ -230,4 +231,26 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
         return list;
     }
+
+    @Override
+    public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject) {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String query =
+            "insert into parking_object (company_uuid, free_slots, 30_minute_price, address, object_name, capacity, "
+                + "latitude, longitude, object_uuid) "
+                + "values ('" + parkingObject.getCompanyId() + "', '" + parkingObject.getFree_slots() + "', '"
+                + parkingObject.getPrice() + "', '"
+                + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
+                + "', '"
+                + parkingObject.getLatitude() + "', '" + parkingObject.getLongitude()
+                + "', '" + uuid + "');";
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+            return uuid;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

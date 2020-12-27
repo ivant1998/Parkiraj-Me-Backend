@@ -5,30 +5,15 @@ import org.springframework.lang.NonNull;
 
 import java.util.Objects;
 
-public class RegisteredUsersResponse {
+public class RegisteredUser extends User {
 
-    @NonNull
-    protected String id;
-
-    @NonNull
-    protected String email;
-
-    @NonNull
-    protected String role;
-
-    @NonNull
-    protected String oib;
-
-    public RegisteredUsersResponse(
+    public RegisteredUser(
         @NonNull String id,
         @NonNull String email,
         @NonNull String role,
         @NonNull String oib
     ) {
-        this.id = id;
-        this.email = email;
-        this.role = role;
-        this.oib = oib;
+        super(id,email,role,oib);
     }
 
     @NonNull

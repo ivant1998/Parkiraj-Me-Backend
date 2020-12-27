@@ -228,7 +228,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 int freeSlots = rs.getInt("free_slots");
                 int price = rs.getInt("30_minute_price");
                 String address = rs.getString("address");
-                String name = rs.getString("name");
+                String name = rs.getString("object_name");
                 BigDecimal latitude = rs.getBigDecimal("latitude");
                 BigDecimal longitude = rs.getBigDecimal("longitude");
                 list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
@@ -242,15 +242,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject) {
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query =
-            "insert into parking_object (company_uuid, free_slots, 30_minute_price, address, object_name, capacity, "
-                + "latitude, longitude, object_uuid) "
-                + "values ('" + parkingObject.getCompanyId() + "', '" + parkingObject.getFree_slots() + "', '"
-                + parkingObject.getPrice() + "', '"
-                + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
-                + "', '"
-                + parkingObject.getLatitude() + "', '" + parkingObject.getLongitude()
-                + "', '" + uuid + "');";
+        String query = "insert into parking_object values ('" + uuid + "', '" + parkingObject.getCompanyId() + "', '"
+            + parkingObject.getPrice() + "', '"
+            + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
+            + "', '"
+            + parkingObject.getLatitude().toString() + "', '" + parkingObject.getLongitude().toString() + "', '"
+            + parkingObject.getFree_slots() + "');";
         try (Statement stmt = databaseConnection.createStatement()) {
             stmt.executeUpdate(query);
             return uuid;

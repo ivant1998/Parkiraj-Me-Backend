@@ -191,12 +191,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(queryBuilder.toString());
             return uuid;
         } catch (SQLException e) {
-            if(databaseConnection != null && savepoint != null) {
+            if(savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
-
                 }
             }
             e.printStackTrace();
@@ -222,9 +222,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
-            if(databaseConnection != null && savepoint != null) {
+            if(savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
                 }
@@ -280,6 +281,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @NonNull
     @Override
     public List<RegisteredUser> getRegisteredUsers() {
         List<RegisteredUser> registeredUsers = new ArrayList<>();

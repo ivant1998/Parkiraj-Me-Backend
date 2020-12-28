@@ -9,9 +9,6 @@ import java.util.Objects;
 public class CompanyParkingObjectRequestBody {
 
     @NonNull
-    private final String companyId;
-
-    @NonNull
     private final int free_slots;
 
     @NonNull
@@ -33,7 +30,6 @@ public class CompanyParkingObjectRequestBody {
     private final BigDecimal longitude;
 
     public CompanyParkingObjectRequestBody(
-        @NonNull String companyId,
         int free_slots,
         int price,
         @NonNull String address,
@@ -42,7 +38,6 @@ public class CompanyParkingObjectRequestBody {
         @NonNull BigDecimal latitude,
         @NonNull BigDecimal longitude
     ) {
-        this.companyId = companyId;
         this.free_slots = free_slots;
         this.price = price;
         this.address = address;
@@ -50,11 +45,6 @@ public class CompanyParkingObjectRequestBody {
         this.capacity = capacity;
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    @NonNull
-    public String getCompanyId() {
-        return companyId;
     }
 
     public int getFree_slots() {
@@ -94,8 +84,7 @@ public class CompanyParkingObjectRequestBody {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         CompanyParkingObjectRequestBody that = (CompanyParkingObjectRequestBody) o;
-        return free_slots == that.free_slots && price == that.price && capacity == that.capacity && companyId.equals(
-            that.companyId)
+        return free_slots == that.free_slots && price == that.price && capacity == that.capacity
             && address.equals(that.address) && name.equals(that.name) && latitude.equals(that.latitude)
             && longitude.equals(
             that.longitude);
@@ -103,7 +92,6 @@ public class CompanyParkingObjectRequestBody {
 
     @Override
     public int hashCode() {
-        return Objects.hash(companyId, free_slots, price, address, name, capacity, latitude, longitude);
+        return Objects.hash(free_slots, price, address, name, capacity, latitude, longitude);
     }
-
 }

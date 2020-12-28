@@ -32,5 +32,8 @@ public interface DatabaseManager {
     String getUserRole(String id);
 
     @Nullable
-    String addParkingObject(@NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody);
+    String addParkingObject(
+        @NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody,
+        @NonNull String companyId
+    );
 }

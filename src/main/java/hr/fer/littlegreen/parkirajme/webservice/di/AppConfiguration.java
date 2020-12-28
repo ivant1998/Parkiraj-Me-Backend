@@ -38,6 +38,7 @@ public class AppConfiguration {
                 "icfjttdivtiins",
                 "447e4ba24d1cc40dff940de459899fbe24bf4c5999da88ff23508aafe16138dc"
             );
+            conn.setAutoCommit(false);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());

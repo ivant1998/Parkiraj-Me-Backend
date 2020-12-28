@@ -8,6 +8,15 @@ public interface TokenManager {
     @NonNull
     String generateToken(String id);
 
+    @NonNull
+    boolean tokenValid(String token);
+
     @Nullable
-    String checkIfTokenValid(String token);
+    String getId(String token);
+
+    @Nullable
+    String removeByToken(String token);
+
+    @Nullable
+    String removeById(String id);
 }

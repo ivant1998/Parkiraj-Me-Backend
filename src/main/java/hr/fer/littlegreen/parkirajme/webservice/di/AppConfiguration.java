@@ -21,7 +21,7 @@ public class AppConfiguration {
 
     @Bean
     public TokenManager provideTokenManager() {
-        return new TokenManagerImpl(new HashMap<>(), new SecureRandom(), Base64.getEncoder());
+        return new TokenManagerImpl(new HashMap<>(), new HashMap<>(), new SecureRandom(), Base64.getEncoder());
     }
 
     @Bean

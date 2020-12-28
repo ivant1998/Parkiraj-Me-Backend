@@ -9,12 +9,14 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -254,6 +256,49 @@ public class DatabaseManagerImpl implements DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    @Override
+    public List<RegisteredUser> getRegisteredUsers() {
+        List<RegisteredUser> registeredUsers = new ArrayList<>();
+        String query = "select * from app_user"
+            + " where role='c' OR role='p';";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String id = rs.getString("user_uuid");
+                String email = rs.getString("email");
+                String role = rs.getString("role");
+                String oib = rs.getString("oib");
+                registeredUsers.add(new RegisteredUser(id, email, role, oib));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return registeredUsers;
+    }
+
+    @Override
+    public String getUserRole(String id) {
+        String queryString = "select * from app_user where user_uuid=?";
+        try (PreparedStatement getRole = databaseConnection.prepareStatement(queryString))
+        {
+            getRole.setString(1, id);
+            ResultSet rs = getRole.executeQuery();
+            if(!rs.next()) return null;
+            return rs.getString("role");
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

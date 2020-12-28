@@ -242,9 +242,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject) {
+    public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject, @NonNull String companyId) {
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "insert into parking_object values ('" + uuid + "', '" + parkingObject.getCompanyId() + "', '"
+        String query = "insert into parking_object values ('" + uuid + "', '" + companyId + "', '"
             + parkingObject.getPrice() + "', '"
             + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
             + "', '"

@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -163,6 +164,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String registerUser(@NonNull RegisterUserRequestBody user) {
+        Savepoint savepoint = null;
         var uuid = UUID.randomUUID().toString().replace("-", "");
         var passwordHash = passwordEncoder.encode(user.getPassword());
         var queryBuilder = new StringBuilder(
@@ -185,9 +187,18 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
         queryBuilder.append("COMMIT TRANSACTION;");
         try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(queryBuilder.toString());
             return uuid;
         } catch (SQLException e) {
+            if(databaseConnection != null && savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+
+                }
+            }
             e.printStackTrace();
         }
         return null;
@@ -195,6 +206,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String registerCompany(@NonNull RegisterCompanyRequestBody company) {
+        Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String query = "BEGIN TRANSACTION;\n"
             + "insert into app_user (email, password_hash, role, oib, user_uuid) "
@@ -204,10 +216,19 @@ public class DatabaseManagerImpl implements DatabaseManager {
             + "insert into company (name, headquarter_address, company_uuid) "
             + "values ('" + company.getName() + "', '" + company.getAddress() + "', '" + uuid + "');"
             + "COMMIT TRANSACTION;";
+
         try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
+            if(databaseConnection != null && savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
         return null;

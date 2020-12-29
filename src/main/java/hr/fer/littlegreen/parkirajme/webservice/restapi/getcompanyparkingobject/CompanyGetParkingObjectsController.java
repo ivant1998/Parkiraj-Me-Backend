@@ -33,15 +33,15 @@ public class CompanyGetParkingObjectsController {
 
     @GetMapping("/company/{companyId}/parkingObjects")
     public ResponseEntity<List<ParkingObject>> parkingObjects(
-        @PathVariable String companyId/*,
-        @RequestHeader("Authentication-Token") String token*/
+        @PathVariable String companyId,
+        @RequestHeader("Authentication-Token") String token
     ) {
-        //var companyTokenId = tokenManager.getId(token);
-        //if (companyTokenId != null) {
+        var companyTokenId = tokenManager.getId(token);
+        if (companyTokenId.equals(companyId)) {
             var objects = databaseManager.getCompanyParkingObjects(companyId);
             return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
-        //}
-        //return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
 }

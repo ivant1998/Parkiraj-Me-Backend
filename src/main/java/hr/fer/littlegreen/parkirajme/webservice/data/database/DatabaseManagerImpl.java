@@ -194,6 +194,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
 
@@ -225,6 +226,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
                 }

@@ -266,12 +266,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
     public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject, @NonNull String companyId) {
         Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "insert into parking_object values ('" + uuid + "', '" + companyId + "', '"
+        String query = "BEGIN TRANSACTION;\n" + "insert into parking_object values ('" + uuid + "', '" + companyId
+            + "', '"
             + parkingObject.getPrice() + "', '"
             + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
             + "', '"
             + parkingObject.getLatitude().toString() + "', '" + parkingObject.getLongitude().toString() + "', '"
-            + parkingObject.getFree_slots() + "');";
+            + parkingObject.getFree_slots() + "');" + "COMMIT TRANSACTION;";
         try (Statement stmt = databaseConnection.createStatement()) {
             savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);

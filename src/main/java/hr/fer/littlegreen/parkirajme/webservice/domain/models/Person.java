@@ -65,4 +65,5 @@ public final class Person extends User {
     public List<Vehicle> getVehicles() {
         return vehicles;
     }
+
 }

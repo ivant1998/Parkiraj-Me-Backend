@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.Objects;
 
+
 public abstract class User {
 
     @NonNull

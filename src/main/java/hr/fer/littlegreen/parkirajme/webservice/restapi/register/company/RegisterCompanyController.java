@@ -2,10 +2,10 @@ package hr.fer.littlegreen.parkirajme.webservice.restapi.register.company;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +30,8 @@ public class RegisterCompanyController {
     @PostMapping("/register/company")
     public ResponseEntity<RegisterCompanyResponse> registerCompany(
         @RequestBody RegisterCompanyRequestBody registerCompanyRequestBody
-    ) {
+
+        ) {
         try{
             var userId = databaseManager.registerCompany(registerCompanyRequestBody);
             var token = tokenManager.generateToken(userId);

@@ -191,7 +191,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(queryBuilder.toString());
             return uuid;
         } catch (SQLException e) {
-            if(databaseConnection != null && savepoint != null) {
+            if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
                 } catch (SQLException e2) {
@@ -222,7 +222,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
-            if(databaseConnection != null && savepoint != null) {
+            if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
                 } catch (SQLException e2) {
@@ -264,6 +264,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject, @NonNull String companyId) {
+        Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String query = "insert into parking_object values ('" + uuid + "', '" + companyId + "', '"
             + parkingObject.getPrice() + "', '"
@@ -272,14 +273,23 @@ public class DatabaseManagerImpl implements DatabaseManager {
             + parkingObject.getLatitude().toString() + "', '" + parkingObject.getLongitude().toString() + "', '"
             + parkingObject.getFree_slots() + "');";
         try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
         return null;
     }
 
+    @NonNull
     @Override
     public List<RegisteredUser> getRegisteredUsers() {
         List<RegisteredUser> registeredUsers = new ArrayList<>();

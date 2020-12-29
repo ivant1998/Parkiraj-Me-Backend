@@ -191,12 +191,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(queryBuilder.toString());
             return uuid;
         } catch (SQLException e) {
-            if(savepoint != null) {
+            if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
-                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
+
                 }
             }
             e.printStackTrace();
@@ -222,10 +222,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
-            if(savepoint != null) {
+            if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
-                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
                 }
@@ -265,17 +264,27 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String addParkingObject(@NonNull CompanyParkingObjectRequestBody parkingObject, @NonNull String companyId) {
+        Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "insert into parking_object values ('" + uuid + "', '" + companyId + "', '"
+        String query = "BEGIN TRANSACTION;\n" + "insert into parking_object values ('" + uuid + "', '" + companyId
+            + "', '"
             + parkingObject.getPrice() + "', '"
             + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
             + "', '"
             + parkingObject.getLatitude().toString() + "', '" + parkingObject.getLongitude().toString() + "', '"
-            + parkingObject.getFree_slots() + "');";
+            + parkingObject.getFree_slots() + "');" + "COMMIT TRANSACTION;";
         try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
             return uuid;
         } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
         return null;

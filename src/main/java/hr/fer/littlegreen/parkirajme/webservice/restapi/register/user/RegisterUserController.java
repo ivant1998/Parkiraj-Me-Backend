@@ -28,11 +28,14 @@ public class RegisterUserController {
 
     @PostMapping("/register/user")
     public ResponseEntity<RegisterUserResponse> regUser(@RequestBody RegisterUserRequestBody regUserReqBody){
-        var userId = databaseManager.registerUser(regUserReqBody);
-        if (userId != null) {
+        try{
+            var userId = databaseManager.registerUser(regUserReqBody);
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterUserResponse(token, userId), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterUserResponse(token, userId, null), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(new RegisterUserResponse(null, null, ex.getMessage()), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new RegisterUserResponse(null, null), HttpStatus.CONFLICT);
+
+
     }
 }

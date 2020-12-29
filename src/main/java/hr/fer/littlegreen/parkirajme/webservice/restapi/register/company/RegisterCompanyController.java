@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.restapi.register.company;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.register.user.RegisterUserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -30,12 +31,13 @@ public class RegisterCompanyController {
     public ResponseEntity<RegisterCompanyResponse> registerCompany(
         @RequestBody RegisterCompanyRequestBody registerCompanyRequestBody
     ) {
-        String userId = databaseManager.registerCompany(registerCompanyRequestBody);
-        if (userId != null) {
+        try{
+            var userId = databaseManager.registerCompany(registerCompanyRequestBody);
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterCompanyResponse(token, userId), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterCompanyResponse(token, userId, null), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(new RegisterCompanyResponse(null, null, ex.getMessage()), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new RegisterCompanyResponse(null, null), HttpStatus.CONFLICT);
     }
 
 }

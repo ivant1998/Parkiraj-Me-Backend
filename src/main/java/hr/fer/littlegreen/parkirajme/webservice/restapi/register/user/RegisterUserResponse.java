@@ -1,10 +1,11 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.register.user;
 
+import hr.fer.littlegreen.parkirajme.webservice.restapi.Response;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
-public class RegisterUserResponse {
+public class RegisterUserResponse extends Response {
 
     @Nullable
     private final String token;
@@ -12,7 +13,8 @@ public class RegisterUserResponse {
     @Nullable
     private final String id;
 
-    public RegisterUserResponse(@Nullable String token, @Nullable String id) {
+    public RegisterUserResponse(@Nullable String token, @Nullable String id, @Nullable String error) {
+        super(error);
         this.token = token;
         this.id = id;
     }
@@ -39,4 +41,7 @@ public class RegisterUserResponse {
     public String getId() {
         return id;
     }
+
+    @Nullable
+    public String getError() {return error;}
 }

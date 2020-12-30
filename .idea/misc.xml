@@ -7,7 +7,6 @@
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.springframework.lang.Nullable" />
     <option name="myDefaultNotNull" value="org.springframework.lang.NonNull" />
-    <option name="myDefaultPattern" value="org.springframework." />
     <option name="myNullables">
       <value>
         <list size="14">

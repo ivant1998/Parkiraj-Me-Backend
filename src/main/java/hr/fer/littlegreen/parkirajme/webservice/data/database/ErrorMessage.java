@@ -12,11 +12,14 @@ public enum ErrorMessage {
 
     PERSON_CHECK_CC("Kartica mora sadržavati točno 16 brojeva"),
 
-    VEHICLE_PK("Već ste evidentirali automobil sa tom registracijom"),
+    VEHICLE_PK("Već ste evidentirali automobil sa zadanom registracijom"),
     VEHICLE_REGISTRATION_NUMBER_CHECK("Registracija vozila je zadana u krivom formatu"),
 
-    COMPANY_UN("Već postoji kompanija sa tome adresom"),
-    COMPANY_NAME_UN("Već postoji kompanija sa ovim imenom"),
+    COMPANY_UN("Već postoji kompanija sa zadanim adresom sjedišta"),
+    COMPANY_NAME_UN("Već postoji kompanija sa zadanim imenom"),
+
+    PARKING_OBJECT_ADDRESS_UN("Već postoji parkirni objekt sa zadanom adresom"),
+    PARKING_OBJECT_NAME_UN("Već postoji parkirni objekt sa zadanim imenom"),
 
     RESERVATION_PKEY("Već imate takvu rezervaciju"),
     RESERVATION_CHECK("Vremenska razlika kraja i početka rezervacije mora biti djeljiva sa 30 minuta"),

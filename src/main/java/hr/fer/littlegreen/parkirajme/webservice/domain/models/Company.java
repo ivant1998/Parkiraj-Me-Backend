@@ -5,27 +5,27 @@ import org.springframework.lang.NonNull;
 public final class Company extends User {
 
     @NonNull
-    private final String address;
+    private final String headquarterAddress;
 
     @NonNull
     private final String name;
 
     public Company(
-        @NonNull String id,
+        @NonNull String userUuid,
         @NonNull String email,
         @NonNull String role,
         @NonNull String oib,
-        @NonNull String address,
+        @NonNull String headquarterAddress,
         @NonNull String name
     ) {
-        super(id, email, role, oib);
-        this.address = address;
+        super(userUuid, email, role, oib);
+        this.headquarterAddress = headquarterAddress;
         this.name = name;
     }
 
     @NonNull
-    public String getAddress() {
-        return address;
+    public String getHeadquarterAddress() {
+        return headquarterAddress;
     }
 
     @NonNull

@@ -8,14 +8,14 @@ import java.util.Objects;
 public final class ParkingObject {
 
     @NonNull
-    private final String id;
+    private final String objectUuid;
 
     @NonNull
-    private final String companyId;
+    private final String companyUuid;
 
     private final int freeSlots;
 
-    private final int price;
+    private final int thirtyMinutePrice;
 
     @NonNull
     private final String address;
@@ -30,19 +30,19 @@ public final class ParkingObject {
     private final BigDecimal longitude;
 
     public ParkingObject(
-        @NonNull String id,
-        @NonNull String companyId,
+        @NonNull String objectUuid,
+        @NonNull String companyUuid,
         int freeSlots,
-        int price,
+        int thirtyMinutePrice,
         @NonNull String address,
         @NonNull String name,
         @NonNull BigDecimal latitude,
         @NonNull BigDecimal longitude
     ) {
-        this.id = id;
-        this.companyId = companyId;
+        this.objectUuid = objectUuid;
+        this.companyUuid = companyUuid;
         this.freeSlots = freeSlots;
-        this.price = price;
+        this.thirtyMinutePrice = thirtyMinutePrice;
         this.address = address;
         this.name = name;
         this.latitude = latitude;
@@ -50,21 +50,21 @@ public final class ParkingObject {
     }
 
     @NonNull
-    public String getId() {
-        return id;
+    public String getObjectUuid() {
+        return objectUuid;
     }
 
     @NonNull
-    public String getCompanyId() {
-        return companyId;
+    public String getCompanyUuid() {
+        return companyUuid;
     }
 
     public int getFreeSlots() {
         return freeSlots;
     }
 
-    public int getPrice() {
-        return price;
+    public int getThirtyMinutePrice() {
+        return thirtyMinutePrice;
     }
 
     @NonNull
@@ -92,12 +92,12 @@ public final class ParkingObject {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         ParkingObject that = (ParkingObject) o;
-        return id.equals(that.id);
+        return objectUuid.equals(that.objectUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(objectUuid);
     }
 
 }

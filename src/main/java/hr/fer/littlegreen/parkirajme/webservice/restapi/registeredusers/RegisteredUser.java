@@ -8,32 +8,12 @@ import java.util.Objects;
 public class RegisteredUser extends User {
 
     public RegisteredUser(
-        @NonNull String id,
+        @NonNull String userUuid,
         @NonNull String email,
         @NonNull String role,
         @NonNull String oib
     ) {
-        super(id,email,role,oib);
-    }
-
-    @NonNull
-    public String getId() {
-        return id;
-    }
-
-    @NonNull
-    public String getEmail() {
-        return email;
-    }
-
-    @NonNull
-    public String getRole() {
-        return role;
-    }
-
-    @NonNull
-    public String getOib() {
-        return oib;
+        super(userUuid, email, role, oib);
     }
 
     @Override
@@ -41,12 +21,12 @@ public class RegisteredUser extends User {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         User user = (User) o;
-        return id.equals(user.getId());
+        return userUuid.equals(user.getUserUuid());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(userUuid);
     }
 }
 

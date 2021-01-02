@@ -7,13 +7,13 @@ import java.util.Objects;
 public class RegisterCompanyRequestBody {
 
     @NonNull
-    private final String OIB;
+    private final String oib;
 
     @NonNull
     private final String name;
 
     @NonNull
-    private final String address;
+    private final String headquarterAddress;
 
     @NonNull
     private final String email;
@@ -22,12 +22,12 @@ public class RegisterCompanyRequestBody {
     private final String password;
 
     public RegisterCompanyRequestBody(
-        @NonNull String OIB, @NonNull String name, @NonNull String address,
+        @NonNull String oib, @NonNull String name, @NonNull String headquarterAddress,
         @NonNull String email, @NonNull String password
     ) {
-        this.OIB = OIB;
+        this.oib = oib;
         this.name = name;
-        this.address = address;
+        this.headquarterAddress = headquarterAddress;
         this.email = email;
         this.password = password;
     }
@@ -36,10 +36,10 @@ public class RegisterCompanyRequestBody {
     public String getName() { return name; }
 
     @NonNull
-    public String getAddress() { return address; }
+    public String getHeadquarterAddress() { return headquarterAddress; }
 
     @NonNull
-    public String getOib() { return OIB; }
+    public String getOib() { return oib; }
 
     @NonNull
     public String getEmail() { return email; }
@@ -52,15 +52,15 @@ public class RegisterCompanyRequestBody {
         if (this == o) { return true; }
         if (!(o instanceof RegisterCompanyRequestBody)) { return false; }
         RegisterCompanyRequestBody that = (RegisterCompanyRequestBody) o;
-        return OIB.equals(that.OIB) &&
+        return oib.equals(that.oib) &&
             getName().equals(that.getName()) &&
-            getAddress().equals(that.getAddress()) &&
+            getHeadquarterAddress().equals(that.getHeadquarterAddress()) &&
             getEmail().equals(that.getEmail()) &&
             getPassword().equals(that.getPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(OIB, getName(), getAddress(), getEmail(), getPassword());
+        return Objects.hash(oib, getName(), getHeadquarterAddress(), getEmail(), getPassword());
     }
 }

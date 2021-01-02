@@ -14,7 +14,7 @@ public final class Person extends User {
     private final String lastName;
 
     @NonNull
-    private final String creditCard;
+    private final String creditCardNumber;
 
     @NonNull
     private final YearMonth creditCardExpirationDate;
@@ -23,20 +23,20 @@ public final class Person extends User {
     private final List<Vehicle> vehicles;
 
     public Person(
-        @NonNull String id,
+        @NonNull String userUuid,
         @NonNull String email,
         @NonNull String role,
         @NonNull String oib,
         @NonNull String firstName,
         @NonNull String lastName,
-        @NonNull String creditCard,
+        @NonNull String creditCardNumber,
         @NonNull YearMonth creditCardExpirationDate,
         @NonNull List<Vehicle> vehicles
     ) {
-        super(id, email, role, oib);
+        super(userUuid, email, role, oib);
         this.firstName = firstName;
         this.lastName = lastName;
-        this.creditCard = creditCard;
+        this.creditCardNumber = creditCardNumber;
         this.creditCardExpirationDate = creditCardExpirationDate;
         this.vehicles = vehicles;
     }
@@ -52,8 +52,8 @@ public final class Person extends User {
     }
 
     @NonNull
-    public String getCreditCard() {
-        return creditCard;
+    public String getCreditCardNumber() {
+        return creditCardNumber;
     }
 
     @NonNull

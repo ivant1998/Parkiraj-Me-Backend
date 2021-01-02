@@ -1,35 +1,35 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.register.user;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.register.person;
 
 import hr.fer.littlegreen.parkirajme.webservice.restapi.Response;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
-public class RegisterUserResponse extends Response {
+public class RegisterPersonResponse extends Response {
 
     @Nullable
     private final String token;
 
     @Nullable
-    private final String id;
+    private final String userUuid;
 
-    public RegisterUserResponse(@Nullable String token, @Nullable String id, @Nullable String error) {
+    public RegisterPersonResponse(@Nullable String token, @Nullable String userUuid, @Nullable String error) {
         super(error);
         this.token = token;
-        this.id = id;
+        this.userUuid = userUuid;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        RegisterUserResponse that = (RegisterUserResponse) o;
-        return Objects.equals(token, that.token) && Objects.equals(id, that.id);
+        RegisterPersonResponse that = (RegisterPersonResponse) o;
+        return Objects.equals(token, that.token) && Objects.equals(userUuid, that.userUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token, id);
+        return Objects.hash(token, userUuid);
     }
 
     @Nullable
@@ -38,8 +38,8 @@ public class RegisterUserResponse extends Response {
     }
 
     @Nullable
-    public String getId() {
-        return id;
+    public String getUserUuid() {
+        return userUuid;
     }
 
     @Nullable

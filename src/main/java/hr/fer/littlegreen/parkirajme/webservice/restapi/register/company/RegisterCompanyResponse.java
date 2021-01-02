@@ -11,12 +11,12 @@ public class RegisterCompanyResponse extends Response {
     private final String token;
 
     @Nullable
-    private final String id;
+    private final String userUuid;
 
-    public RegisterCompanyResponse(@Nullable String token, @Nullable String id, @Nullable String error) {
+    public RegisterCompanyResponse(@Nullable String token, @Nullable String userUuid, @Nullable String error) {
         super(error);
         this.token = token;
-        this.id = id;
+        this.userUuid = userUuid;
     }
 
     @Override
@@ -24,20 +24,23 @@ public class RegisterCompanyResponse extends Response {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         RegisterCompanyResponse that = (RegisterCompanyResponse) o;
-        return Objects.equals(token, that.token) && Objects.equals(id, that.id) && Objects.equals(error, that.error);
+        return Objects.equals(token, that.token) && Objects.equals(userUuid, that.userUuid) && Objects.equals(
+            error,
+            that.error
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token, id, error);
+        return Objects.hash(token, userUuid, error);
     }
 
     @Nullable
     public final String getToken() { return token; }
 
     @Nullable
-    public String getId() {
-        return id;
+    public String getUserUuid() {
+        return userUuid;
     }
 
     @Nullable

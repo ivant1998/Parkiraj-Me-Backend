@@ -8,7 +8,7 @@ import java.util.Objects;
 public abstract class User {
 
     @NonNull
-    protected String id;
+    protected String userUuid;
 
     @NonNull
     protected String email;
@@ -20,20 +20,20 @@ public abstract class User {
     protected String oib;
 
     public User(
-        @NonNull String id,
+        @NonNull String userUuid,
         @NonNull String email,
         @NonNull String role,
         @NonNull String oib
     ) {
-        this.id = id;
+        this.userUuid = userUuid;
         this.email = email;
         this.role = role;
         this.oib = oib;
     }
 
     @NonNull
-    public String getId() {
-        return id;
+    public String getUserUuid() {
+        return userUuid;
     }
 
     @NonNull
@@ -56,11 +56,11 @@ public abstract class User {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         User user = (User) o;
-        return id.equals(user.id);
+        return userUuid.equals(user.userUuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(userUuid);
     }
 }

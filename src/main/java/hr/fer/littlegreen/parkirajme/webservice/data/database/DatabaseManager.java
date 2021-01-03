@@ -36,4 +36,7 @@ public interface DatabaseManager {
         @NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody,
         @NonNull String companyUuid
     );
+
+    @Nullable
+    List<ParkingObject> getUserParkingReservations(@NonNull String userId);
 }

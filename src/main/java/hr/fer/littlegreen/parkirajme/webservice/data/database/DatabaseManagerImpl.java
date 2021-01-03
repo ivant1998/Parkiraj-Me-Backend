@@ -303,6 +303,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @Override
+    public List<ParkingObject> getUserParkingReservations(String userId) {
+        return null;
+    }
+
     @NonNull
     @Override
     public List<RegisteredUser> getRegisteredUsers() {

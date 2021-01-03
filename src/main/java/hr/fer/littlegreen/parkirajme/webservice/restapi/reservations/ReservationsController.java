@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
@@ -63,5 +64,21 @@ public class ReservationsController {
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
+    }
+
+    @PostMapping("/user/addReservation")
+    public ResponseEntity<List<ParkingObject>> addReservation(
+        @RequestHeader("Authentication-Token") String token
+    ) {
+        var userId = tokenManager.getId(token);
+        if (userId != null) {
+            try {
+                String id = databaseManager.addReservation(userId);
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            } catch (IllegalArgumentException ex) {
+                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            }
+        }
+        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 }

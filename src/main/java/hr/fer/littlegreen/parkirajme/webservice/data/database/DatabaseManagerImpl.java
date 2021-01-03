@@ -313,6 +313,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @Override
+    public String addReservation(String userId) {
+        return null;
+    }
+
     @NonNull
     @Override
     public List<RegisteredUser> getRegisteredUsers() {

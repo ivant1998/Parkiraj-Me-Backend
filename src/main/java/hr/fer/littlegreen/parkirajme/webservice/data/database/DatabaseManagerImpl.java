@@ -9,8 +9,8 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -126,7 +126,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             var resultSet = statement.executeQuery(query);
             var vehicles = new ArrayList<Vehicle>();
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 String registrationNumber = resultSet.getString("registration_number");
                 vehicles.add(new Vehicle(registrationNumber));
             }
@@ -305,10 +305,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @NonNull
     @Override
-    public List<RegisteredUser> getRegisteredUsers() {
-        List<RegisteredUser> registeredUsers = new ArrayList<>();
-        String query = "select * from app_user"
-            + " where role='c' OR role='p';";
+    public List<User> getRegisteredUsers() {
+        List<User> registeredUsers = new ArrayList<>();
+
+        String query = "select * from app_user;";
+        String query2;
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -321,8 +322,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
-                registeredUsers.add(new RegisteredUser(id, email, role, oib));
-            }
+                if(role.equals("c")) registeredUsers.add(getCompany(id,email,role,oib));
+                else if(role.equals("p")) registeredUsers.add(getPerson(id,email,role,oib));
+                else registeredUsers.add(getAdministrator(id,email,role,oib));
+                }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -330,6 +333,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
+    @Nullable
     public String getUserRole(String userUuid) {
         String queryString = "select * from app_user where user_uuid=?";
         try (PreparedStatement getRole = databaseConnection.prepareStatement(queryString)) {

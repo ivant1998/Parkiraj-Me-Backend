@@ -5,7 +5,6 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -26,7 +25,7 @@ public interface DatabaseManager {
     List<ParkingObject> getParkingObjects();
 
     @NonNull
-    List<RegisteredUser> getRegisteredUsers();
+    List<User> getRegisteredUsers();
 
     @Nullable
     String getUserRole(String userUuid);

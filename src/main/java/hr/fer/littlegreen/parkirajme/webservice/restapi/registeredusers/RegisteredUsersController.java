@@ -1,6 +1,7 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +30,12 @@ public class RegisteredUsersController {
     }
 
     @GetMapping("/registeredUsers")
-    public ResponseEntity<List<RegisteredUser>> registeredUsers(@RequestHeader("Authentication-Token") String token) {
+    public ResponseEntity<List<User>> registeredUsers(@RequestHeader("Authentication-Token") String token) {
         String id = tokenManager.getId(token);
         if(id == null) return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         String role = databaseManager.getUserRole(id);
         if(!role.equals("a")) return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        List<RegisteredUser> list = databaseManager.getRegisteredUsers();
+        List<User> list = databaseManager.getRegisteredUsers();
         return new ResponseEntity<>(list, HttpStatus.ACCEPTED);
     }
 }

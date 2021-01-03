@@ -35,6 +35,9 @@ public class ReservationsController {
         @RequestHeader("Authentication-Token") String token
     ) {
         var userTokenId = tokenManager.getId(token);
+        if (userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        String role = databaseManager.getUserRole(userId);
+        if (!role.equals("p")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
@@ -43,4 +46,19 @@ public class ReservationsController {
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
     }
+
+    /*@GetMapping("/parkingObject/{objectId}/users")
+    public ResponseEntity<List<ParkingObject>> reservations(
+        @PathVariable String userId,
+        @RequestHeader("Authentication-Token") String token
+    ) {
+        var userTokenId = tokenManager.getId(token);
+
+        if (userTokenId.equals(userId)) {
+            var objects = databaseManager.getUserParkingReservations(userId);
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+    }*/
 }

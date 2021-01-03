@@ -1,9 +1,9 @@
 package hr.fer.littlegreen.parkirajme.webservice.di;
 
-import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.database.DatabaseManagerImpl;
-import hr.fer.littlegreen.parkirajme.webservice.session.TokenManager;
-import hr.fer.littlegreen.parkirajme.webservice.session.TokenManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
+import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManagerImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +21,7 @@ public class AppConfiguration {
 
     @Bean
     public TokenManager provideTokenManager() {
-        return new TokenManagerImpl(new HashMap<>(), new SecureRandom(), Base64.getEncoder());
+        return new TokenManagerImpl(new HashMap<>(), new HashMap<>(), new SecureRandom(), Base64.getEncoder());
     }
 
     @Bean
@@ -38,6 +38,7 @@ public class AppConfiguration {
                 "icfjttdivtiins",
                 "447e4ba24d1cc40dff940de459899fbe24bf4c5999da88ff23508aafe16138dc"
             );
+            conn.setAutoCommit(false);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());

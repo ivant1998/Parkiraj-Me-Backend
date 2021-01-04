@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -307,7 +308,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<Reservation> getUserParkingReservations(String userId) {
         List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation;";
+        String query = "select * from reservation where person_uuid = " + userId + ";";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -316,7 +317,20 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-
+                String parkingId = rs.getString("object_uuid");
+                String registrationNumber = rs.getString("registration_number");
+                String personId = rs.getString("person_uuid");
+                Timestamp startTime = rs.getTimestamp("start_time");
+                Timestamp endTime = rs.getTimestamp("end_time");
+                Date expirationDate = rs.getDate("expiration_date");
+                short daysOfWeek = rs.getShort("days_in_week");
+                list.add(new Reservation(registrationNumber,
+                    personId,
+                    parkingId,
+                    expirationDate,
+                    startTime,
+                    endTime,
+                    daysOfWeek));
             }
         } catch (SQLException e) {
             e.printStackTrace();

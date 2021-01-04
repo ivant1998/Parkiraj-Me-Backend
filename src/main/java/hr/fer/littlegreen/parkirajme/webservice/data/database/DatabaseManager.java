@@ -1,6 +1,7 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
@@ -38,7 +39,7 @@ public interface DatabaseManager {
     );
 
     @Nullable
-    List<ParkingObject> getUserParkingReservations(@NonNull String userId);
+    List<Reservation> getUserParkingReservations(@NonNull String userId);
 
     @Nullable
     List<ParkingObject> getReservationsOnParking(@NonNull String companyId);

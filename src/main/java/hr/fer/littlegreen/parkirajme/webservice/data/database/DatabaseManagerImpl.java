@@ -4,6 +4,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Administrator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Company;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
@@ -304,8 +305,23 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public List<ParkingObject> getUserParkingReservations(String userId) {
-        return null;
+    public List<Reservation> getUserParkingReservations(String userId) {
+        List<Reservation> list = new LinkedList<>();
+        String query = "select * from reservation;";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     @Override

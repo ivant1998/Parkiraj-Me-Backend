@@ -81,4 +81,6 @@ public class ReservationsController {
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
+
+    //@DeleteMapping("/reservation/{reservationId}")
 }

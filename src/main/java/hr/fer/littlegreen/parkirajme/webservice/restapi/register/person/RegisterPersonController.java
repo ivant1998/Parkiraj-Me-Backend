@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.register.user;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.register.person;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class RegisterUserController {
+public class RegisterPersonController {
 
     @NonNull
     private final DatabaseManager databaseManager;
@@ -18,7 +18,7 @@ public class RegisterUserController {
     @NonNull
     private final TokenManager tokenManager;
 
-    public RegisterUserController(
+    public RegisterPersonController(
         @NonNull DatabaseManager databaseManager,
         @NonNull TokenManager tokenManager
     ) {
@@ -26,13 +26,16 @@ public class RegisterUserController {
         this.tokenManager = tokenManager;
     }
 
-    @PostMapping("/register/user")
-    public ResponseEntity<RegisterUserResponse> regUser(@RequestBody RegisterUserRequestBody regUserReqBody){
-        var userId = databaseManager.registerUser(regUserReqBody);
-        if (userId != null) {
+    @PostMapping("/register/person")
+    public ResponseEntity<RegisterPersonResponse> regUser(@RequestBody RegisterPersonRequestBody regUserReqBody) {
+        try {
+            var userId = databaseManager.registerPerson(regUserReqBody);
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterUserResponse(token, userId), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterPersonResponse(token, userId, null), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(new RegisterPersonResponse(null, null, ex.getMessage()), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new RegisterUserResponse(null, null), HttpStatus.CONFLICT);
+
+
     }
 }

@@ -34,11 +34,12 @@ public class CompanyParkingObjectController {
     ) {
         var companyId = tokenManager.getId(token);
         if (companyId != null) {
-            String id = databaseManager.addParkingObject(parkingObjectRequestBody, companyId);
-            if (id != null) {
-                return new ResponseEntity<>(new CompanyAddParkingObjectResponse(id), HttpStatus.CREATED);
+            try {
+                String id = databaseManager.addParkingObject(parkingObjectRequestBody, companyId);
+                return new ResponseEntity<>(new CompanyAddParkingObjectResponse(id, null), HttpStatus.CREATED);
+            } catch(IllegalArgumentException ex) {
+                return new ResponseEntity<>(new CompanyAddParkingObjectResponse(null, ex.getMessage()), HttpStatus.CONFLICT);
             }
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }

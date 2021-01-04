@@ -5,6 +5,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,13 +30,15 @@ public class RegisterCompanyController {
     @PostMapping("/register/company")
     public ResponseEntity<RegisterCompanyResponse> registerCompany(
         @RequestBody RegisterCompanyRequestBody registerCompanyRequestBody
-    ) {
-        String userId = databaseManager.registerCompany(registerCompanyRequestBody);
-        if (userId != null) {
+
+        ) {
+        try{
+            var userId = databaseManager.registerCompany(registerCompanyRequestBody);
             var token = tokenManager.generateToken(userId);
-            return new ResponseEntity<>(new RegisterCompanyResponse(token, userId), HttpStatus.CREATED);
+            return new ResponseEntity<>(new RegisterCompanyResponse(token, userId, null), HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(new RegisterCompanyResponse(null, null, ex.getMessage()), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new RegisterCompanyResponse(null, null), HttpStatus.CONFLICT);
     }
 
 }

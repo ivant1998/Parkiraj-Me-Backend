@@ -42,7 +42,7 @@ public interface DatabaseManager {
     List<Reservation> getUserParkingReservations(@NonNull String userId);
 
     @Nullable
-    List<ParkingObject> getReservationsOnParking(@NonNull String companyId);
+    List<Reservation> getReservationsOnParking(@NonNull String companyId);
 
     @Nullable
     String addReservation(@NonNull String userId);

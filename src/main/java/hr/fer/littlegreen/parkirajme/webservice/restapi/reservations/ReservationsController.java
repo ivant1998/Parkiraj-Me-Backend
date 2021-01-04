@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class ReservationsController {
 
 
     @GetMapping("/user/{userId}/reservations")
-    public ResponseEntity<List<ParkingObject>> reservations(
+    public ResponseEntity<List<Reservation>> reservations(
         @PathVariable String userId,
         @RequestHeader("Authentication-Token") String token
     ) {

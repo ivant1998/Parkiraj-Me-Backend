@@ -339,8 +339,38 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public List<ParkingObject> getReservationsOnParking(String companyId) {
-        return null;
+    public List<Reservation> getReservationsOnParking(String objectId) {
+        List<Reservation> list = new LinkedList<>();
+        String query = "select * from reservation where object_uuid = " + objectId + ";";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String parkingId = rs.getString("object_uuid");
+                String registrationNumber = rs.getString("registration_number");
+                String personId = rs.getString("person_uuid");
+                Timestamp startTime = rs.getTimestamp("start_time");
+                Timestamp endTime = rs.getTimestamp("end_time");
+                Date expirationDate = rs.getDate("expiration_date");
+                short daysOfWeek = rs.getShort("days_in_week");
+                list.add(new Reservation(
+                    registrationNumber,
+                    personId,
+                    parkingId,
+                    expirationDate,
+                    startTime,
+                    endTime,
+                    daysOfWeek
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     @Override

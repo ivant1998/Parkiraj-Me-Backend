@@ -378,4 +378,38 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return list;
     }
 
+    @Override
+    public String parkingObjectOwner(String parkingObjectId) {
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid = '" + parkingObjectId + "';";
+
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            if (!rs.next()) { return null; }
+            String companyId = rs.getString("company_uuid");
+            return companyId;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteParkingObject(String parkingObjectId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM parking_object WHERE object_uuid = '"
+            + parkingObjectId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

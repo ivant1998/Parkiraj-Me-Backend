@@ -38,4 +38,10 @@ public interface DatabaseManager {
 
     @Nullable
     List<ParkingObject> getCompanyParkingObjects(@NonNull String companyId);
+
+    @Nullable
+    String parkingObjectOwner(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteParkingObject(@NonNull String parkingObjectId);
 }

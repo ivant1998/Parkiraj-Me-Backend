@@ -38,7 +38,7 @@ public class DeleteUserController {
         if (tokenId != null && role != null) {
             if (userId.equals(tokenId) || role.equals("a")) {
                 databaseManager.deleteUser(userId);
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return new ResponseEntity<>(HttpStatus.OK);
             }
         }
 

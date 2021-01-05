@@ -309,7 +309,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
         List<User> registeredUsers = new ArrayList<>();
 
         String query = "select * from app_user;";
-        String query2;
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -335,7 +334,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     @Nullable
     public String getUserRole(String userUuid) {
-        String queryString = "select * from app_user where user_uuid=?;";
+        String queryString = "select * from app_user where user_uuid=?";
         try (PreparedStatement getRole = databaseConnection.prepareStatement(queryString)) {
             getRole.setString(1, userUuid);
             ResultSet rs = getRole.executeQuery();
@@ -380,11 +379,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String parkingObjectOwner(String parkingObjectId) {
-        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid =?;";
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid =?";
 
         try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
             stmt.setString(1, parkingObjectId);
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery();
             if (!rs.next()) { return null; }
             String companyId = rs.getString("company_uuid");
             return companyId;

@@ -335,7 +335,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     @Nullable
     public String getUserRole(String userUuid) {
-        String queryString = "select * from app_user where user_uuid=?";
+        String queryString = "select * from app_user where user_uuid=?;";
         try (PreparedStatement getRole = databaseConnection.prepareStatement(queryString)) {
             getRole.setString(1, userUuid);
             ResultSet rs = getRole.executeQuery();
@@ -380,14 +380,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String parkingObjectOwner(String parkingObjectId) {
-        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid = '" + parkingObjectId + "';";
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid =?;";
 
-        try (
-            Statement stmt = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, parkingObjectId);
             ResultSet rs = stmt.executeQuery(query);
             if (!rs.next()) { return null; }
             String companyId = rs.getString("company_uuid");

@@ -167,35 +167,38 @@ public class DatabaseManagerImpl implements DatabaseManager {
         Savepoint savepoint = null;
         var uuid = UUID.randomUUID().toString().replace("-", "");
         var passwordHash = passwordEncoder.encode(registerPersonRequestBody.getPassword());
-        var queryBuilder = new StringBuilder(
-            """
-                BEGIN TRANSACTION;
-                INSERT INTO app_user (email, password_hash, role, oib, user_uuid)
-                VALUES ('%s', '%s', 'p', '%s', '%s');
-                INSERT INTO person (first_name, last_name, credit_card_number, credit_card_expiration_date, person_uuid)
-                VALUES ('%s', '%s', '%s', '%s-01'::DATE, '%s');
-                """.formatted(
-                registerPersonRequestBody.getEmail(),
-                passwordHash,
-                registerPersonRequestBody.getOib(),
-                uuid,
-                registerPersonRequestBody.getFirstName(),
-                registerPersonRequestBody.getLastName(),
-                registerPersonRequestBody.getCreditCardNumber(),
-                registerPersonRequestBody.getCreditCardExpirationDate(),
-                uuid
-            )
-        );
-        for (String regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
-            queryBuilder.append(
-                "INSERT INTO vehicle (registration_number, person_uuid) VALUES ('%s', '%s');\n"
-                    .formatted(regPlate, uuid)
-            );
-        }
+        var queryBuilder = new StringBuilder();
+        queryBuilder.append("""
+            BEGIN TRANSACTION;\s
+            insert into app_user (email, password_hash, role, oib, user_uuid) 
+            values (?, ?, 'p', ?, ?);
+            insert into person (first_name, last_name, credit_card_number, credit_card_expiration_date, person_uuid) 
+            values (?, ?, ?, ?, ?);
+            \s""");
+
+        queryBuilder.append(
+            "insert into vehicle (registration_number, person_uuid) values (?, ?);"
+                .repeat(registerPersonRequestBody
+                .getRegistrationNumbers()
+                .size()));
         queryBuilder.append("COMMIT TRANSACTION;");
-        try (Statement stmt = databaseConnection.createStatement()) {
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(queryBuilder.toString())) {
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(queryBuilder.toString());
+            stmt.setString(1, registerPersonRequestBody.getEmail());
+            stmt.setString(2, passwordHash);
+            stmt.setString(3, registerPersonRequestBody.getOib());
+            stmt.setString(4, uuid);
+            stmt.setString(5, registerPersonRequestBody.getFirstName());
+            stmt.setString(6, registerPersonRequestBody.getLastName());
+            stmt.setString(7, registerPersonRequestBody.getCreditCardNumber());
+            stmt.setDate(8, Date.valueOf(registerPersonRequestBody.getCreditCardExpirationDate() + "-01"));
+            stmt.setString(9, uuid);
+            int i = 10;
+            for(var regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
+                stmt.setString(i++, regPlate);
+                stmt.setString(i++, uuid);
+            }
+            stmt.executeUpdate();
             return uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
@@ -204,7 +207,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
                     throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
-
                 }
             }
             e.printStackTrace();
@@ -213,21 +215,31 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String registerCompany(@NonNull RegisterCompanyRequestBody company) {
+    public String registerCompany(@NonNull RegisterCompanyRequestBody registerCompanyRequestBody) {
         Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "BEGIN TRANSACTION;\n"
-            + "insert into app_user (email, password_hash, role, oib, user_uuid) "
-            + "values ('" + company.getEmail() + "', '" + passwordEncoder.encode(company.getPassword()) + "', 'c', '"
-            + company.getOib()
-            + "', '" + uuid + "');\n"
-            + "insert into company (name, headquarter_address, company_uuid) "
-            + "values ('" + company.getName() + "', '" + company.getHeadquarterAddress() + "', '" + uuid + "');"
-            + "COMMIT TRANSACTION;";
+        var passwordHash = passwordEncoder.encode(registerCompanyRequestBody.getPassword());
+        StringBuilder queryBuilder = new StringBuilder();
 
-        try (Statement stmt = databaseConnection.createStatement()) {
+        queryBuilder.append("""
+            BEGIN TRANSACTION;
+            insert into app_user (email, password_hash, role, oib, user_uuid) 
+            values (?, ?, 'c', ?, ?);
+            insert into company (name, headquarter_address, company_uuid) 
+            values (?, ?, ?);
+            COMMIT TRANSACTION;
+            """);
+
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(queryBuilder.toString())) {
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(query);
+            stmt.setString(1, registerCompanyRequestBody.getEmail());
+            stmt.setString(2, passwordHash);
+            stmt.setString(3, registerCompanyRequestBody.getOib());
+            stmt.setString(4, uuid);
+            stmt.setString(5, registerCompanyRequestBody.getName());
+            stmt.setString(6, registerCompanyRequestBody.getHeadquarterAddress());
+            stmt.setString(7, uuid);
+            stmt.executeUpdate();
             return uuid;
         } catch (SQLException e) {
             if (savepoint != null) {

@@ -46,7 +46,7 @@ public class CompanyDeleteParkingObjectController {
         if(companyId != null && tokenId != null && role != null) {
             if(companyId.equals(tokenId) || role.equals("a")) {
                 databaseManager.deleteParkingObject(parkingObjectId);
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return new ResponseEntity<>(HttpStatus.OK);
             }
         }
 

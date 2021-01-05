@@ -1,7 +1,6 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ReservationController {
 
@@ -34,7 +34,7 @@ public class ReservationController {
 
 
     @GetMapping("/user/{userId}/reservations")
-    public ResponseEntity<List<Reservation>> reservations(
+    public ResponseEntity<List<Reservation>> getUserReservations(
         @PathVariable String userId,
         @RequestHeader("Authentication-Token") String token
     ) {
@@ -45,14 +45,14 @@ public class ReservationController {
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
     }
 
     @GetMapping("/parkingObject/{objectId}/users")
-    public ResponseEntity<List<ParkingObject>> reservationsOnParking(
+    public ResponseEntity<List<Reservation>> reservationsOnParking(
         @PathVariable String objectId,
         @RequestHeader("Authentication-Token") String token
     ) {
@@ -63,7 +63,7 @@ public class ReservationController {
 
         if (companyTokenId.equals(objectId)) {
             var objects = databaseManager.getReservationsOnParking(companyTokenId);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -78,7 +78,7 @@ public class ReservationController {
         if (userId != null) {
             try {
                 String id = databaseManager.addReservation(reservation, userId);
-                return new ResponseEntity<>(null, HttpStatus.OK);
+                return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK);
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
             }

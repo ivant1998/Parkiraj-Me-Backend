@@ -44,7 +44,7 @@ public class ReservationController {
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(null, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -58,11 +58,11 @@ public class ReservationController {
         var companyTokenId = tokenManager.getId(token);
         if (companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(objectId);
-        if (!role.equals("p")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        if (!role.equals("c")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (companyTokenId.equals(objectId)) {
             var objects = databaseManager.getReservationsOnParking(companyTokenId);
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(null, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -77,7 +77,7 @@ public class ReservationController {
         if (userId != null) {
             try {
                 String id = databaseManager.addReservation(reservation, userId);
-                return new ResponseEntity<>(null, HttpStatus.CREATED);
+                return new ResponseEntity<>(null, HttpStatus.OK);
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
             }

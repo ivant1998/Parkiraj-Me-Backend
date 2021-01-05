@@ -42,7 +42,7 @@ public class CompanyDeleteParkingObjectController {
         var tokenId = tokenManager.getId(token);
         String companyId = databaseManager.parkingObjectOwner(parkingObjectId);
 
-        if(companyId == tokenId || databaseManager.getUserRole(tokenId) == "a") {
+        if(companyId.equals(tokenId) || databaseManager.getUserRole(tokenId).equals("a")) {
             databaseManager.deleteParkingObject(parkingObjectId);
             return HttpStatus.ACCEPTED;
         }

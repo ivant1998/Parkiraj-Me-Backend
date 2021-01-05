@@ -350,4 +350,78 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @Override
+    public List<ParkingObject> getCompanyParkingObjects(String companyId) {
+        List<ParkingObject> list = new LinkedList<>();
+        String query = "SELECT * FROM parking_object WHERE company_uuid = '" + companyId + "';";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String id = rs.getString("object_uuid");
+                //String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                String address = rs.getString("address");
+                String name = rs.getString("object_name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public String parkingObjectOwner(String parkingObjectId) {
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid = '" + parkingObjectId + "';";
+
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            if (!rs.next()) { return null; }
+            String companyId = rs.getString("company_uuid");
+            return companyId;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteParkingObject(String parkingObjectId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM parking_object WHERE object_uuid = '"
+            + parkingObjectId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
+            + userId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

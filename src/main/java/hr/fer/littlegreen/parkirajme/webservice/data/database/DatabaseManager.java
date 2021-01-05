@@ -35,4 +35,16 @@ public interface DatabaseManager {
         @NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody,
         @NonNull String companyUuid
     );
+
+    @Nullable
+    List<ParkingObject> getCompanyParkingObjects(@NonNull String companyId);
+
+    @Nullable
+    String parkingObjectOwner(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteParkingObject(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteUser(@NonNull String userId);
 }

@@ -37,10 +37,14 @@ public class CompanyGetParkingObjectsController {
         @RequestHeader("Authentication-Token") String token
     ) {
         var companyTokenId = tokenManager.getId(token);
-        if (companyTokenId.equals(companyId)) {
-            var objects = databaseManager.getCompanyParkingObjects(companyId);
-            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
+
+        if (companyTokenId != null) {
+            if (companyTokenId.equals(companyId)) {
+                var objects = databaseManager.getCompanyParkingObjects(companyId);
+                return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
+            }
         }
+
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 

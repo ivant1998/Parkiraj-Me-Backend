@@ -44,4 +44,7 @@ public interface DatabaseManager {
 
     @Nullable
     void deleteParkingObject(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteUser(@NonNull String userId);
 }

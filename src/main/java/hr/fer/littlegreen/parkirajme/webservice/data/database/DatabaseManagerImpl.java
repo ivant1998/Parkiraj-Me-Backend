@@ -406,7 +406,19 @@ public class DatabaseManagerImpl implements DatabaseManager {
             + parkingObjectId + "';" + "COMMIT TRANSACTION;";
 
         try (Statement stmt = databaseConnection.createStatement()) {
-            stmt.executeQuery(query);
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
+            + userId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,24 +1,17 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.deleteparkingobject;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.deleteuser;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManagerImpl;
-import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Objects;
-
 @RestController
-public class CompanyDeleteParkingObjectController {
+public class DeleteUserController {
 
     @NonNull
     private final DatabaseManager databaseManager;
@@ -26,7 +19,7 @@ public class CompanyDeleteParkingObjectController {
     @NonNull
     private final TokenManager tokenManager;
 
-    public CompanyDeleteParkingObjectController(
+    public DeleteUserController(
         DatabaseManager databaseManager,
         TokenManager tokenManager
     ) {
@@ -34,18 +27,17 @@ public class CompanyDeleteParkingObjectController {
         this.tokenManager = tokenManager;
     }
 
-    @DeleteMapping("/parkingObject/{parkingObjectId}")
-    public ResponseEntity<HttpStatus> deleteParkingObject (
-        @PathVariable String parkingObjectId,
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<HttpStatus> deleteUser(
+        @PathVariable String userId,
         @RequestHeader("Authentication-token") String token
     ) {
         var tokenId = tokenManager.getId(token);
-        String companyId = databaseManager.parkingObjectOwner(parkingObjectId);
         String role = databaseManager.getUserRole(tokenId);
 
-        if(companyId != null && tokenId != null && role != null) {
-            if(companyId.equals(tokenId) || role.equals("a")) {
-                databaseManager.deleteParkingObject(parkingObjectId);
+        if (tokenId != null && role != null) {
+            if (userId.equals(tokenId) || role.equals("a")) {
+                databaseManager.deleteUser(userId);
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
         }

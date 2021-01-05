@@ -10,7 +10,6 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -523,6 +522,18 @@ public class DatabaseManagerImpl implements DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void deleteReservation(String reservationId) {
+        /*String query = "BEGIN TRANSACTION;\n" + "DELETE FROM reservation WHERE reservation_uuid = '"
+            + reservationId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
     }
 
 }

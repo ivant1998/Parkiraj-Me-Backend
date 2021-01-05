@@ -7,6 +7,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,5 +86,21 @@ public class ReservationController {
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
     }
 
-    //@DeleteMapping("/reservation/{reservationId}")
+    @DeleteMapping("/reservation/{reservationId}")
+    public ResponseEntity<HttpStatus> deleteReservation(
+        @PathVariable String reservationId,
+        @RequestHeader("Authentication-token") String token
+    ) {
+        var tokenId = tokenManager.getId(token);
+        String role = databaseManager.getUserRole(tokenId);
+
+        if (tokenId != null && role != null) {
+            if (reservationId.equals(tokenId) || role.equals("p")) {
+                databaseManager.deleteReservation(reservationId);
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
 }

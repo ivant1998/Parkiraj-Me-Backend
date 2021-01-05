@@ -10,11 +10,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-public class ReservationsController {
+public class ReservationController {
 
     @NonNull
     private final DatabaseManager databaseManager;
@@ -22,7 +23,7 @@ public class ReservationsController {
     @NonNull
     private final TokenManager tokenManager;
 
-    public ReservationsController(
+    public ReservationController(
         @NonNull DatabaseManager databaseManager,
         @NonNull TokenManager tokenManager
     ) {
@@ -68,14 +69,15 @@ public class ReservationsController {
     }
 
     @PostMapping("/user/addReservation")
-    public ResponseEntity<List<ParkingObject>> addReservation(
+    public ResponseEntity<ReservationResponse> addReservation(
+        @RequestBody ReservationRequestBody reservation,
         @RequestHeader("Authentication-Token") String token
     ) {
         var userId = tokenManager.getId(token);
         if (userId != null) {
             try {
-                String id = databaseManager.addReservation(userId);
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+                String id = databaseManager.addReservation(reservation, userId);
+                return new ResponseEntity<>(null, HttpStatus.CREATED);
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
             }

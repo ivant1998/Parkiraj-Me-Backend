@@ -11,6 +11,7 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.Company
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -374,7 +375,31 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String addReservation(String userId) {
+    public String addReservation(ReservationRequestBody reservation, String userId) {
+        Savepoint savepoint = null;
+        String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + reservation.getParkingId()
+            + "', '"
+            + userId + "', '"
+            + reservation.getRegistrationNumber() + "', '"
+            + reservation.getStartTime() + "', '"
+            + reservation.getEndTime() + "', '"
+            + reservation.getDaysOfWeek() + "', '"
+            + reservation.getExpirationDate() + "');" + "COMMIT TRANSACTION;";
+        try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
+            stmt.executeUpdate(query);
+            return null;
+        } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        }
         return null;
     }
 

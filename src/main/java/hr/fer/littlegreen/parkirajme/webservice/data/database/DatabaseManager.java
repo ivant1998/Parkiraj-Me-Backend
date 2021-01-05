@@ -28,7 +28,7 @@ public interface DatabaseManager {
     List<ParkingObject> getParkingObjects();
 
     @NonNull
-    List<RegisteredUser> getRegisteredUsers();
+    List<User> getRegisteredUsers();
 
     @Nullable
     String getUserRole(String userUuid);
@@ -38,6 +38,18 @@ public interface DatabaseManager {
         @NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody,
         @NonNull String companyUuid
     );
+
+    @Nullable
+    List<ParkingObject> getCompanyParkingObjects(@NonNull String companyId);
+
+    @Nullable
+    String parkingObjectOwner(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteParkingObject(@NonNull String parkingObjectId);
+
+    @Nullable
+    void deleteUser(@NonNull String userId);
 
     @Nullable
     List<Reservation> getUserParkingReservations(@NonNull String userId);

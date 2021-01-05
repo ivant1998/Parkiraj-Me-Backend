@@ -13,6 +13,7 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.Register
 import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -129,7 +130,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             var resultSet = statement.executeQuery(query);
             var vehicles = new ArrayList<Vehicle>();
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 String registrationNumber = resultSet.getString("registration_number");
                 vehicles.add(new Vehicle(registrationNumber));
             }
@@ -405,10 +406,11 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @NonNull
     @Override
-    public List<RegisteredUser> getRegisteredUsers() {
-        List<RegisteredUser> registeredUsers = new ArrayList<>();
-        String query = "select * from app_user"
-            + " where role='c' OR role='p';";
+    public List<User> getRegisteredUsers() {
+        List<User> registeredUsers = new ArrayList<>();
+
+        String query = "select * from app_user;";
+        String query2;
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -421,8 +423,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
-                registeredUsers.add(new RegisteredUser(id, email, role, oib));
-            }
+                if(role.equals("c")) registeredUsers.add(getCompany(id,email,role,oib));
+                else if(role.equals("p")) registeredUsers.add(getPerson(id,email,role,oib));
+                else registeredUsers.add(getAdministrator(id,email,role,oib));
+                }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -430,6 +434,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
+    @Nullable
     public String getUserRole(String userUuid) {
         String queryString = "select * from app_user where user_uuid=?";
         try (PreparedStatement getRole = databaseConnection.prepareStatement(queryString)) {
@@ -444,6 +449,80 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
 
         return null;
+    }
+
+    @Override
+    public List<ParkingObject> getCompanyParkingObjects(String companyId) {
+        List<ParkingObject> list = new LinkedList<>();
+        String query = "SELECT * FROM parking_object WHERE company_uuid = '" + companyId + "';";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String id = rs.getString("object_uuid");
+                //String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                String address = rs.getString("address");
+                String name = rs.getString("object_name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public String parkingObjectOwner(String parkingObjectId) {
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid = '" + parkingObjectId + "';";
+
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            if (!rs.next()) { return null; }
+            String companyId = rs.getString("company_uuid");
+            return companyId;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteParkingObject(String parkingObjectId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM parking_object WHERE object_uuid = '"
+            + parkingObjectId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
+            + userId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

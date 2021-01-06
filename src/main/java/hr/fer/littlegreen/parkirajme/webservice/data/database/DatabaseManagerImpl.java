@@ -376,7 +376,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String addReservation(ReservationRequestBody reservation, String userId) {
+    public boolean addReservation(ReservationRequestBody reservation, String userId) {
         Savepoint savepoint = null;
         String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + reservation.getParkingId()
             + "', '"
@@ -389,7 +389,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try (Statement stmt = databaseConnection.createStatement()) {
             savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
-            return null;
+            return true;
         } catch (SQLException e) {
             if (savepoint != null) {
                 try {
@@ -401,7 +401,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             }
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 
     @NonNull

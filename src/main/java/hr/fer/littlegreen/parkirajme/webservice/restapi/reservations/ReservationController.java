@@ -70,15 +70,15 @@ public class ReservationController {
     }
 
     @PostMapping("/user/addReservation")
-    public ResponseEntity<ReservationResponse> addReservation(
+    public ResponseEntity<HttpStatus> addReservation(
         @RequestBody ReservationRequestBody reservation,
         @RequestHeader("Authentication-Token") String token
     ) {
         var userId = tokenManager.getId(token);
         if (userId != null) {
             try {
-                String id = databaseManager.addReservation(reservation, userId);
-                return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK);
+                boolean id = databaseManager.addReservation(reservation, userId);
+                if (id) { return new ResponseEntity<>(null, HttpStatus.OK); }
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
             }

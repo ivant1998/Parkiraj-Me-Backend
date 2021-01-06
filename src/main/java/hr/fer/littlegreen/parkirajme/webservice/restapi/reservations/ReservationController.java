@@ -89,14 +89,15 @@ public class ReservationController {
     @DeleteMapping("/reservation/{reservationId}")
     public ResponseEntity<HttpStatus> deleteReservation(
         @PathVariable String reservationId,
+        @RequestBody ReservationDeleteRequestBody reservation,
         @RequestHeader("Authentication-token") String token
     ) {
-        var tokenId = tokenManager.getId(token);
-        String role = databaseManager.getUserRole(tokenId);
+        var userId = tokenManager.getId(token);
+        String role = databaseManager.getUserRole(userId);
 
-        if (tokenId != null && role != null) {
-            if (reservationId.equals(tokenId) || role.equals("p")) {
-                databaseManager.deleteReservation(reservationId);
+        if (userId != null && role != null) {
+            if (role.equals("p")) {
+                databaseManager.deleteReservation(reservation, userId);
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
         }

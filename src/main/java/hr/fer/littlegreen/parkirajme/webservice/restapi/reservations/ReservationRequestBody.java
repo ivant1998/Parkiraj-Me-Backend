@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.BitSet;
 import java.util.Objects;
 
 public class ReservationRequestBody {
@@ -18,7 +19,7 @@ public class ReservationRequestBody {
     private final Date expirationDate;
 
     @NonNull
-    private final short daysOfWeek;
+    private final BitSet daysOfWeek;
 
     @NonNull
     private final String registrationNumber;
@@ -30,7 +31,7 @@ public class ReservationRequestBody {
         @NonNull Timestamp startTime,
         @NonNull Timestamp endTime,
         @NonNull Date expirationDate,
-        short daysOfWeek,
+        @NonNull BitSet daysOfWeek,
         @NonNull String registrationNumber,
         @NonNull String parkingId
     ) {
@@ -57,7 +58,7 @@ public class ReservationRequestBody {
         return expirationDate;
     }
 
-    public short getDaysOfWeek() {
+    public BitSet getDaysOfWeek() {
         return daysOfWeek;
     }
 

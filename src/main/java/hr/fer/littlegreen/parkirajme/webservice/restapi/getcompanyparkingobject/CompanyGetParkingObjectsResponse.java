@@ -18,6 +18,11 @@ public class CompanyGetParkingObjectsResponse {
         CompanyParkingObjectList = companyParkingObjectList;
     }
 
+    @NonNull
+    public List<ParkingObject> getCompanyParkingObjectList() {
+        return CompanyParkingObjectList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

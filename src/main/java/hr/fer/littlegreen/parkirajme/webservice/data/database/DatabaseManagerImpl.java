@@ -6,7 +6,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import org.springframework.lang.NonNull;
@@ -281,17 +281,17 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String addParkingObject(
-        @NonNull CompanyParkingObjectRequestBody parkingObject,
+        @NonNull CompanyAddParkingObjectRequestBody parkingObject,
         @NonNull String companyUuid
     ) {
         Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
         String query = """
-            BEGIN TRANSACTION;\s
-            insert into parking_object 
+            BEGIN TRANSACTION;
+            insert into parking_object (object_uuid, company_uuid, "30_minute_price", address, object_name, capacity, latitude, longitude, free_slots)
             values (?, ?, ?, ?, ?, ?, ?, ?, ?);
-            \s"""
-            + "COMMIT TRANSACTION;";
+            COMMIT TRANSACTION;
+            """;
         try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
             savepoint = databaseConnection.setSavepoint();
             stmt.setString(1, uuid);
@@ -300,8 +300,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.setString(4, parkingObject.getAddress());
             stmt.setString(5, parkingObject.getName());
             stmt.setInt(6, parkingObject.getCapacity());
-            stmt.setString(7, parkingObject.getLatitude().toString());
-            stmt.setString(8, parkingObject.getLongitude().toString());
+            stmt.setBigDecimal(7, parkingObject.getLatitude());
+            stmt.setBigDecimal(8, parkingObject.getLongitude());
             stmt.setInt(9, parkingObject.getFree_slots());
             stmt.executeUpdate();
             return uuid;

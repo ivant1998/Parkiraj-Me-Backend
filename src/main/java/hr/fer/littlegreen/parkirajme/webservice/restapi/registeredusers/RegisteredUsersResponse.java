@@ -17,6 +17,11 @@ public class RegisteredUsersResponse {
         UserList = userList;
     }
 
+    @NonNull
+    public List<User> getUserList() {
+        return UserList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

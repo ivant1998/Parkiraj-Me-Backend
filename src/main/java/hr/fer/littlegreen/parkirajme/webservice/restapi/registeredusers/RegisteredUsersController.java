@@ -30,12 +30,18 @@ public class RegisteredUsersController {
     }
 
     @GetMapping("/registeredUsers")
-    public ResponseEntity<List<User>> registeredUsers(@RequestHeader("Authentication-Token") String token) {
+    public ResponseEntity<RegisteredUsersResponse> registeredUsers(
+        @RequestHeader("Authentication-Token") String token
+    ) {
         String id = tokenManager.getId(token);
-        if(id == null) return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        if (id == null) {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        }
         String role = databaseManager.getUserRole(id);
-        if(!role.equals("a")) return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        if (!role.equals("a")) {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        }
         List<User> list = databaseManager.getRegisteredUsers();
-        return new ResponseEntity<>(list, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new RegisteredUsersResponse(list), HttpStatus.ACCEPTED);
     }
 }

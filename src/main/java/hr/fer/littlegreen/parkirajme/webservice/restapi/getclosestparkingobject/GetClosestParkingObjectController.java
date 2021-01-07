@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.parkingobjects;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.getclosestparkingobject;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
 
 import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
@@ -20,25 +18,19 @@ import static java.lang.Math.sqrt;
 import static java.lang.Math.toRadians;
 
 @RestController
-public class ParkingObjectsController {
+public class GetClosestParkingObjectController {
 
     @NonNull
     private final DatabaseManager databaseManager;
 
-    public ParkingObjectsController(
+    public GetClosestParkingObjectController(
         @NonNull DatabaseManager databaseManager
     ) {
         this.databaseManager = databaseManager;
     }
 
-    @GetMapping("/parkingObjects")
-    public ResponseEntity<List<ParkingObject>> parkingObjects() {
-        var objects = databaseManager.getParkingObjects();
-        return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
-    }
-
     @GetMapping("/closestParkingObject")
-    public ResponseEntity<ParkingObject> closestParkingObject(
+    public ResponseEntity<GetClosestParkingObjectResponse> closestParkingObject(
         @RequestParam("lat") BigDecimal latitude,
         @RequestParam("long") BigDecimal longitude
     ) {
@@ -54,7 +46,7 @@ public class ParkingObjectsController {
                 curr = getDistanceFromLatLonInKm(latitude, longitude, object);
             }
         }
-        return new ResponseEntity<>(min, HttpStatus.OK);
+        return new ResponseEntity<>(new GetClosestParkingObjectResponse(min), HttpStatus.OK);
     }
 
     private double getDistanceFromLatLonInKm(BigDecimal latitude, BigDecimal longitude, ParkingObject object) {
@@ -66,5 +58,4 @@ public class ParkingObjectsController {
         var c = 2 * atan2(sqrt(a), sqrt(1 - a));
         return R * c;
     }
-
 }

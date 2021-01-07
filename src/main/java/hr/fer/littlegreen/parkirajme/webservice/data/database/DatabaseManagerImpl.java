@@ -267,11 +267,22 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String companyId = rs.getString("company_uuid");
                 int freeSlots = rs.getInt("free_slots");
                 int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
                 String address = rs.getString("address");
                 String name = rs.getString("object_name");
                 BigDecimal latitude = rs.getBigDecimal("latitude");
                 BigDecimal longitude = rs.getBigDecimal("longitude");
-                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+                list.add(new ParkingObject(
+                    id,
+                    companyId,
+                    freeSlots,
+                    capacity,
+                    price,
+                    address,
+                    name,
+                    latitude,
+                    longitude
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -380,11 +391,22 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String id = rs.getString("object_uuid");
                 int freeSlots = rs.getInt("free_slots");
                 int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
                 String address = rs.getString("address");
                 String name = rs.getString("object_name");
                 BigDecimal latitude = rs.getBigDecimal("latitude");
                 BigDecimal longitude = rs.getBigDecimal("longitude");
-                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+                list.add(new ParkingObject(
+                    id,
+                    companyId,
+                    freeSlots,
+                    capacity,
+                    price,
+                    address,
+                    name,
+                    latitude,
+                    longitude
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();

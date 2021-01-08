@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CompanyParkingObjectController {
+public class CompanyAddParkingObjectController {
 
     @NonNull
     DatabaseManager databaseManager;
@@ -19,7 +19,7 @@ public class CompanyParkingObjectController {
     @NonNull
     TokenManager tokenManager;
 
-    public CompanyParkingObjectController(
+    public CompanyAddParkingObjectController(
         @NonNull DatabaseManager databaseManager,
         @NonNull TokenManager tokenManager
     ) {
@@ -29,7 +29,7 @@ public class CompanyParkingObjectController {
 
     @PostMapping("/company/addParkingObject")
     public ResponseEntity<CompanyAddParkingObjectResponse> addParking(
-        @RequestBody CompanyParkingObjectRequestBody parkingObjectRequestBody,
+        @RequestBody CompanyAddParkingObjectRequestBody parkingObjectRequestBody,
         @RequestHeader("Authentication-Token") String token
     ) {
         var companyId = tokenManager.getId(token);

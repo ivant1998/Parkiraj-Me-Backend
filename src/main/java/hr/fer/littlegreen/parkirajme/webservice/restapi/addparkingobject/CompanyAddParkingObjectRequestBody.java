@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 
-public class CompanyParkingObjectRequestBody {
+public class CompanyAddParkingObjectRequestBody {
 
     @NonNull
     private final int free_slots;
@@ -29,7 +29,7 @@ public class CompanyParkingObjectRequestBody {
     @NonNull
     private final BigDecimal longitude;
 
-    public CompanyParkingObjectRequestBody(
+    public CompanyAddParkingObjectRequestBody(
         int free_slots,
         int price,
         @NonNull String address,
@@ -83,7 +83,7 @@ public class CompanyParkingObjectRequestBody {
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        CompanyParkingObjectRequestBody that = (CompanyParkingObjectRequestBody) o;
+        CompanyAddParkingObjectRequestBody that = (CompanyAddParkingObjectRequestBody) o;
         return free_slots == that.free_slots && price == that.price && capacity == that.capacity
             && address.equals(that.address) && name.equals(that.name) && latitude.equals(that.latitude)
             && longitude.equals(

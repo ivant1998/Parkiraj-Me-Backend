@@ -279,13 +279,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 list.add(new ParkingObject(
                     id,
                     companyId,
-                    freeSlots,
-                    capacity,
                     price,
                     address,
                     name,
+                    capacity,
                     latitude,
-                    longitude
+                    longitude,
+                    freeSlots
                 ));
             }
         } catch (SQLException e) {
@@ -500,13 +500,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 list.add(new ParkingObject(
                     id,
                     companyId,
-                    freeSlots,
-                    capacity,
                     price,
                     address,
                     name,
+                    capacity,
                     latitude,
-                    longitude
+                    longitude,
+                    freeSlots
                 ));
             }
         } catch (SQLException e) {

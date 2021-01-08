@@ -17,6 +17,8 @@ public final class ParkingObject {
 
     private final int thirtyMinutePrice;
 
+    private final int capacity;
+
     @NonNull
     private final String address;
 
@@ -34,6 +36,7 @@ public final class ParkingObject {
         @NonNull String companyUuid,
         int freeSlots,
         int thirtyMinutePrice,
+        int capacity,
         @NonNull String address,
         @NonNull String name,
         @NonNull BigDecimal latitude,
@@ -43,6 +46,7 @@ public final class ParkingObject {
         this.companyUuid = companyUuid;
         this.freeSlots = freeSlots;
         this.thirtyMinutePrice = thirtyMinutePrice;
+        this.capacity = capacity;
         this.address = address;
         this.name = name;
         this.latitude = latitude;
@@ -66,6 +70,8 @@ public final class ParkingObject {
     public int getThirtyMinutePrice() {
         return thirtyMinutePrice;
     }
+
+    public int getCapacity() {return capacity;}
 
     @NonNull
     public String getAddress() {

@@ -7,7 +7,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
@@ -171,35 +171,36 @@ public class DatabaseManagerImpl implements DatabaseManager {
         Savepoint savepoint = null;
         var uuid = UUID.randomUUID().toString().replace("-", "");
         var passwordHash = passwordEncoder.encode(registerPersonRequestBody.getPassword());
-        var queryBuilder = new StringBuilder(
-            """
-                BEGIN TRANSACTION;
-                INSERT INTO app_user (email, password_hash, role, oib, user_uuid)
-                VALUES ('%s', '%s', 'p', '%s', '%s');
-                INSERT INTO person (first_name, last_name, credit_card_number, credit_card_expiration_date, person_uuid)
-                VALUES ('%s', '%s', '%s', '%s-01'::DATE, '%s');
-                """.formatted(
-                registerPersonRequestBody.getEmail(),
-                passwordHash,
-                registerPersonRequestBody.getOib(),
-                uuid,
-                registerPersonRequestBody.getFirstName(),
-                registerPersonRequestBody.getLastName(),
-                registerPersonRequestBody.getCreditCardNumber(),
-                registerPersonRequestBody.getCreditCardExpirationDate(),
-                uuid
-            )
-        );
-        for (String regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
-            queryBuilder.append(
-                "INSERT INTO vehicle (registration_number, person_uuid) VALUES ('%s', '%s');\n"
-                    .formatted(regPlate, uuid)
-            );
-        }
-        queryBuilder.append("COMMIT TRANSACTION;");
-        try (Statement stmt = databaseConnection.createStatement()) {
+
+        String query = """
+            BEGIN TRANSACTION;\s
+            insert into app_user (email, password_hash, role, oib, user_uuid) 
+            values (?, ?, 'p', ?, ?);
+            insert into person (first_name, last_name, credit_card_number, credit_card_expiration_date, person_uuid) 
+            values (?, ?, ?, ?, ?);
+            \s"""
+            + "insert into vehicle (registration_number, person_uuid) values (?, ?);"
+            .repeat(registerPersonRequestBody
+                .getRegistrationNumbers()
+                .size())
+            + "COMMIT TRANSACTION;";
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(queryBuilder.toString());
+            stmt.setString(1, registerPersonRequestBody.getEmail());
+            stmt.setString(2, passwordHash);
+            stmt.setString(3, registerPersonRequestBody.getOib());
+            stmt.setString(4, uuid);
+            stmt.setString(5, registerPersonRequestBody.getFirstName());
+            stmt.setString(6, registerPersonRequestBody.getLastName());
+            stmt.setString(7, registerPersonRequestBody.getCreditCardNumber());
+            stmt.setDate(8, Date.valueOf(registerPersonRequestBody.getCreditCardExpirationDate() + "-01"));
+            stmt.setString(9, uuid);
+            int i = 10;
+            for(var regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
+                stmt.setString(i++, regPlate);
+                stmt.setString(i++, uuid);
+            }
+            stmt.executeUpdate();
             return uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
@@ -208,7 +209,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
                     throw new IllegalArgumentException(ErrorMessage.getMessage(e));
                 } catch (SQLException e2) {
                     e2.printStackTrace();
-
                 }
             }
             e.printStackTrace();
@@ -217,21 +217,29 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String registerCompany(@NonNull RegisterCompanyRequestBody company) {
+    public String registerCompany(@NonNull RegisterCompanyRequestBody registerCompanyRequestBody) {
         Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "BEGIN TRANSACTION;\n"
-            + "insert into app_user (email, password_hash, role, oib, user_uuid) "
-            + "values ('" + company.getEmail() + "', '" + passwordEncoder.encode(company.getPassword()) + "', 'c', '"
-            + company.getOib()
-            + "', '" + uuid + "');\n"
-            + "insert into company (name, headquarter_address, company_uuid) "
-            + "values ('" + company.getName() + "', '" + company.getHeadquarterAddress() + "', '" + uuid + "');"
-            + "COMMIT TRANSACTION;";
+        var passwordHash = passwordEncoder.encode(registerCompanyRequestBody.getPassword());
 
-        try (Statement stmt = databaseConnection.createStatement()) {
+        String query = """
+            BEGIN TRANSACTION;
+            insert into app_user (email, password_hash, role, oib, user_uuid) 
+            values (?, ?, 'c', ?, ?);
+            insert into company (name, headquarter_address, company_uuid) 
+            values (?, ?, ?);
+            COMMIT TRANSACTION;
+            """;
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(query);
+            stmt.setString(1, registerCompanyRequestBody.getEmail());
+            stmt.setString(2, passwordHash);
+            stmt.setString(3, registerCompanyRequestBody.getOib());
+            stmt.setString(4, uuid);
+            stmt.setString(5, registerCompanyRequestBody.getName());
+            stmt.setString(6, registerCompanyRequestBody.getHeadquarterAddress());
+            stmt.setString(7, uuid);
+            stmt.executeUpdate();
             return uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
@@ -263,11 +271,22 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String companyId = rs.getString("company_uuid");
                 int freeSlots = rs.getInt("free_slots");
                 int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
                 String address = rs.getString("address");
                 String name = rs.getString("object_name");
                 BigDecimal latitude = rs.getBigDecimal("latitude");
                 BigDecimal longitude = rs.getBigDecimal("longitude");
-                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+                list.add(new ParkingObject(
+                    id,
+                    companyId,
+                    freeSlots,
+                    capacity,
+                    price,
+                    address,
+                    name,
+                    latitude,
+                    longitude
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -277,21 +296,29 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public String addParkingObject(
-        @NonNull CompanyParkingObjectRequestBody parkingObject,
+        @NonNull CompanyAddParkingObjectRequestBody parkingObject,
         @NonNull String companyUuid
     ) {
         Savepoint savepoint = null;
         String uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "BEGIN TRANSACTION;\n" + "insert into parking_object values ('" + uuid + "', '" + companyUuid
-            + "', '"
-            + parkingObject.getPrice() + "', '"
-            + parkingObject.getAddress() + "', '" + parkingObject.getName() + "', '" + parkingObject.getCapacity()
-            + "', '"
-            + parkingObject.getLatitude().toString() + "', '" + parkingObject.getLongitude().toString() + "', '"
-            + parkingObject.getFree_slots() + "');" + "COMMIT TRANSACTION;";
-        try (Statement stmt = databaseConnection.createStatement()) {
+        String query = """
+            BEGIN TRANSACTION;
+            insert into parking_object (object_uuid, company_uuid, "30_minute_price", address, object_name, capacity, latitude, longitude, free_slots)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            COMMIT TRANSACTION;
+            """;
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(query);
+            stmt.setString(1, uuid);
+            stmt.setString(2, companyUuid);
+            stmt.setInt(3, parkingObject.getPrice());
+            stmt.setString(4, parkingObject.getAddress());
+            stmt.setString(5, parkingObject.getName());
+            stmt.setInt(6, parkingObject.getCapacity());
+            stmt.setBigDecimal(7, parkingObject.getLatitude());
+            stmt.setBigDecimal(8, parkingObject.getLongitude());
+            stmt.setInt(9, parkingObject.getFree_slots());
+            stmt.executeUpdate();
             return uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
@@ -410,7 +437,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
         List<User> registeredUsers = new ArrayList<>();
 
         String query = "select * from app_user;";
-        String query2;
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -452,7 +478,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public List<ParkingObject> getCompanyParkingObjects(String companyId) {
+    public List<ParkingObject> getCompanyParkingObjects(@NonNull String companyId) {
         List<ParkingObject> list = new LinkedList<>();
         String query = "SELECT * FROM parking_object WHERE company_uuid = '" + companyId + "';";
         try (
@@ -464,14 +490,24 @@ public class DatabaseManagerImpl implements DatabaseManager {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 String id = rs.getString("object_uuid");
-                //String companyId = rs.getString("company_uuid");
                 int freeSlots = rs.getInt("free_slots");
                 int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
                 String address = rs.getString("address");
                 String name = rs.getString("object_name");
                 BigDecimal latitude = rs.getBigDecimal("latitude");
                 BigDecimal longitude = rs.getBigDecimal("longitude");
-                list.add(new ParkingObject(id, companyId, freeSlots, price, address, name, latitude, longitude));
+                list.add(new ParkingObject(
+                    id,
+                    companyId,
+                    freeSlots,
+                    capacity,
+                    price,
+                    address,
+                    name,
+                    latitude,
+                    longitude
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -480,19 +516,14 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public String parkingObjectOwner(String parkingObjectId) {
-        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid = '" + parkingObjectId + "';";
+    public String parkingObjectOwner(@NonNull String parkingObjectId) {
+        String query = "SELECT company_uuid FROM parking_object WHERE object_uuid =?";
 
-        try (
-            Statement stmt = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
-            ResultSet rs = stmt.executeQuery(query);
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, parkingObjectId);
+            ResultSet rs = stmt.executeQuery();
             if (!rs.next()) { return null; }
-            String companyId = rs.getString("company_uuid");
-            return companyId;
+            return rs.getString("company_uuid");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -502,7 +533,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public void deleteParkingObject(String parkingObjectId) {
+    public void deleteParkingObject(@NonNull String parkingObjectId) {
         String query = "BEGIN TRANSACTION;\n" + "DELETE FROM parking_object WHERE object_uuid = '"
             + parkingObjectId + "';" + "COMMIT TRANSACTION;";
 
@@ -514,7 +545,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUser(@NonNull String userId) {
         String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
             + userId + "';" + "COMMIT TRANSACTION;";
 

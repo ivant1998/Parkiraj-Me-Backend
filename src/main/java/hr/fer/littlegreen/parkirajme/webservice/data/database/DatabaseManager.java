@@ -3,7 +3,7 @@ package hr.fer.littlegreen.parkirajme.webservice.data.database;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
@@ -35,7 +35,7 @@ public interface DatabaseManager {
 
     @Nullable
     String addParkingObject(
-        @NonNull CompanyParkingObjectRequestBody companyParkingObjectRequestBody,
+        @NonNull CompanyAddParkingObjectRequestBody companyAddParkingObjectRequestBody,
         @NonNull String companyUuid
     );
 

@@ -41,6 +41,7 @@ public class ReservationController {
         var userTokenId = tokenManager.getId(token);
         if (userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(userId);
+        assert role != null;
         if (!role.equals("p")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (userTokenId.equals(userId)) {
@@ -59,6 +60,7 @@ public class ReservationController {
         var companyTokenId = tokenManager.getId(token);
         if (companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(objectId);
+        assert role != null;
         if (!role.equals("c")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (companyTokenId.equals(objectId)) {

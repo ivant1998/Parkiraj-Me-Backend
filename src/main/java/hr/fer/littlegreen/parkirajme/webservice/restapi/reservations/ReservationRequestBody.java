@@ -58,6 +58,7 @@ public class ReservationRequestBody {
         return expirationDate;
     }
 
+    @NonNull
     public BitSet getDaysOfWeek() {
         return daysOfWeek;
     }

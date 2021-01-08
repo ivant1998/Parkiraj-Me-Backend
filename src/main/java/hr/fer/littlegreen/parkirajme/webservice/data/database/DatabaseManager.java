@@ -1,10 +1,13 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -47,4 +50,16 @@ public interface DatabaseManager {
 
     @Nullable
     void deleteUser(@NonNull String userId);
+
+    @Nullable
+    List<Reservation> getUserParkingReservations(@NonNull String userId);
+
+    @Nullable
+    List<Reservation> getReservationsOnParking(@NonNull String companyId);
+
+    @Nullable
+    boolean addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
+
+    @Nullable
+    void deleteReservation(ReservationDeleteRequestBody userId, String id);
 }

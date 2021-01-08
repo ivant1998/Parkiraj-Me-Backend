@@ -4,11 +4,14 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Administrator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Company;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Person;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -330,6 +334,103 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @Override
+    public List<Reservation> getUserParkingReservations(String userId) {
+        List<Reservation> list = new LinkedList<>();
+        String query = "select * from reservation where person_uuid = " + userId + ";";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String parkingId = rs.getString("object_uuid");
+                String registrationNumber = rs.getString("registration_number");
+                String personId = rs.getString("person_uuid");
+                Timestamp startTime = rs.getTimestamp("start_time");
+                Timestamp endTime = rs.getTimestamp("end_time");
+                Date expirationDate = rs.getDate("expiration_date");
+                short daysOfWeek = rs.getShort("days_in_week");
+                list.add(new Reservation(registrationNumber,
+                    personId,
+                    parkingId,
+                    expirationDate,
+                    startTime,
+                    endTime,
+                    daysOfWeek));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public List<Reservation> getReservationsOnParking(String objectId) {
+        List<Reservation> list = new LinkedList<>();
+        String query = "select * from reservation where object_uuid = " + objectId + ";";
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String parkingId = rs.getString("object_uuid");
+                String registrationNumber = rs.getString("registration_number");
+                String personId = rs.getString("person_uuid");
+                Timestamp startTime = rs.getTimestamp("start_time");
+                Timestamp endTime = rs.getTimestamp("end_time");
+                Date expirationDate = rs.getDate("expiration_date");
+                short daysOfWeek = rs.getShort("days_in_week");
+                list.add(new Reservation(
+                    registrationNumber,
+                    personId,
+                    parkingId,
+                    expirationDate,
+                    startTime,
+                    endTime,
+                    daysOfWeek
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public boolean addReservation(ReservationRequestBody reservation, String userId) {
+        Savepoint savepoint = null;
+        String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + reservation.getParkingId()
+            + "', '"
+            + userId + "', '"
+            + reservation.getRegistrationNumber() + "', '"
+            + reservation.getStartTime() + "', '"
+            + reservation.getEndTime() + "', '"
+            + reservation.getDaysOfWeek() + "', '"
+            + reservation.getExpirationDate() + "');" + "COMMIT TRANSACTION;";
+        try (Statement stmt = databaseConnection.createStatement()) {
+            savepoint = databaseConnection.setSavepoint();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     @NonNull
     @Override
     public List<User> getRegisteredUsers() {
@@ -447,6 +548,19 @@ public class DatabaseManagerImpl implements DatabaseManager {
     public void deleteUser(@NonNull String userId) {
         String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
             + userId + "';" + "COMMIT TRANSACTION;";
+
+        try (Statement stmt = databaseConnection.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteReservation(ReservationDeleteRequestBody reservation, String id) {
+        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM reservation WHERE user_uuid = '"
+            + id + "'AND object_uuid='" + reservation.getParkingId() + "'AND registaration_number = '"
+            + reservation.getRegistrationNumber() + "';" + "COMMIT TRANSACTION;";
 
         try (Statement stmt = databaseConnection.createStatement()) {
             stmt.executeUpdate(query);

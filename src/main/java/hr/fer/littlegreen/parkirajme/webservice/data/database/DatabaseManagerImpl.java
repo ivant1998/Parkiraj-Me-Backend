@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -442,28 +443,56 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return false;
     }
 
+
+
+
     @NonNull
     @Override
     public List<User> getRegisteredUsers() {
         List<User> registeredUsers = new ArrayList<>();
 
-        String query = "select * from app_user;";
+        String queryPerson = "select * from person p join app_user au on au.user_uuid = p.person_uuid;";
+        String queryCompany = "select * from company c join app_user au on au.user_uuid = c.company_uuid;";
+        String queryAdministrator = "select * from app_user where role = 'a';";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery(queryPerson);
             while (rs.next()) {
                 String id = rs.getString("user_uuid");
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
-                if(role.equals("c")) registeredUsers.add(getCompany(id,email,role,oib));
-                else if(role.equals("p")) registeredUsers.add(getPerson(id,email,role,oib));
-                else registeredUsers.add(getAdministrator(id,email,role,oib));
-                }
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String creditCardNumber = rs.getString("credit_card_number");
+                YearMonth creditCardExpirationDate = YearMonth.from(rs.getDate("credit_card_expiration_date").toLocalDate());
+                List<Vehicle> vehicles = getVehicles(id);
+                registeredUsers.add(new Person(id,email,role,oib,firstName,lastName,creditCardNumber,creditCardExpirationDate,vehicles));
+            }
+
+            rs = stmt.executeQuery(queryCompany);
+            while (rs.next()) {
+                String id = rs.getString("user_uuid");
+                String email = rs.getString("email");
+                String role = rs.getString("role");
+                String oib = rs.getString("oib");
+                String name = rs.getString("name");
+                String headquarterAddress = rs.getString("headquarter_address");
+                registeredUsers.add(new Company(id,email,role,oib,headquarterAddress,name));
+            }
+            rs = stmt.executeQuery(queryAdministrator);
+            while (rs.next()) {
+                String id = rs.getString("user_uuid");
+                String email = rs.getString("email");
+                String role = rs.getString("role");
+                String oib = rs.getString("oib");
+                registeredUsers.add(new Administrator(id,email,role,oib));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

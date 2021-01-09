@@ -15,15 +15,14 @@ public class Simulator {
     public Simulator(Connection databaseConnection) {
         this.databaseConnection = databaseConnection;
 
-        Runnable simulateRunnable = () -> {
-            Savepoint savepoint = null;
-            String sql = """
+        String sql = """
             BEGIN TRANSACTION;
             update parking_object
             set free_slots = (floor(random() * (capacity + 1))::int)::int;
             COMMIT TRANSACTION;
             """;
-
+        Runnable simulateRunnable = () -> {
+            Savepoint savepoint = null;
             try(PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
                 savepoint = databaseConnection.setSavepoint();
                 stmt.executeUpdate();

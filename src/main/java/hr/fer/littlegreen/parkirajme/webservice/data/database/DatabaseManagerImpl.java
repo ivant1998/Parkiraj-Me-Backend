@@ -1,5 +1,6 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
+import hr.fer.littlegreen.parkirajme.webservice.di.AppConfiguration;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Administrator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Company;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
@@ -17,6 +18,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -30,6 +32,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("SqlResolve")
 public class DatabaseManagerImpl implements DatabaseManager {
@@ -165,6 +170,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
     private Administrator getAdministrator(String userUuid, String email, String role, String oib) {
         return new Administrator(userUuid, email, role, oib);
     }
+
+
 
     @Override
     public String registerPerson(@NonNull RegisterPersonRequestBody registerPersonRequestBody) {

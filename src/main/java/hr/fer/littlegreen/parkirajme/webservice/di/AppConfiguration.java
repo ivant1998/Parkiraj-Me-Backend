@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.di;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.Simulator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManagerImpl;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,11 @@ public class AppConfiguration {
     @Bean
     public DatabaseManager provideDatabaseManager() {
         return new DatabaseManagerImpl(providePasswordEncoder(), provideDatabaseConnection());
+    }
+
+    @Bean
+    public Simulator provideSimulator() {
+        return new Simulator(provideDatabaseConnection());
     }
 
     @Bean

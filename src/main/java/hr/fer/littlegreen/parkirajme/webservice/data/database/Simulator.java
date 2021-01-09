@@ -25,7 +25,7 @@ public class Simulator {
             """;
 
             try(PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
-                databaseConnection.setSavepoint();
+                savepoint = databaseConnection.setSavepoint();
                 stmt.executeUpdate();
             } catch (SQLException ex) {
                 if (savepoint != null) {

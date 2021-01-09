@@ -219,6 +219,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 }
             }
             e.printStackTrace();
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Pogreška pri registraciji");
         }
         return null;
     }
@@ -258,6 +260,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 }
             }
             e.printStackTrace();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Pogreška pri registraciji");
         }
         return null;
     }
@@ -574,6 +578,45 @@ public class DatabaseManagerImpl implements DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void editPerson(String uuid, String firstName, String lastName, String creditCardNumber, String creditCardExpirationDate) {
+        Savepoint savepoint = null;
+
+        String query = """
+            BEGIN TRANSACTION;
+            update person
+            set first_name = ?,
+            last_name = ?,
+            credit_card_number = ?,
+            credit_card_expiration_date = ?
+            where person_uuid = ?;
+            COMMIT TRANSACTION;
+            """;
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            savepoint = databaseConnection.setSavepoint();
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, creditCardNumber);
+            stmt.setDate(4, Date.valueOf(creditCardExpirationDate + "-01"));
+            stmt.setString(5, uuid);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Pogreška pri uređivanju podataka");
+        }
+
     }
 
 }

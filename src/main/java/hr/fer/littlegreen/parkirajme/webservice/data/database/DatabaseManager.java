@@ -62,4 +62,7 @@ public interface DatabaseManager {
 
     @Nullable
     void deleteReservation(ReservationDeleteRequestBody userId, String id);
+
+    @Nullable
+    void editPerson(String uuid, String firstName, String lastName, String creditCardNumber, String creditCardExpirationDate);
 }

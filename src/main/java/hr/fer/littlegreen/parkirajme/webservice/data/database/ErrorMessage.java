@@ -22,7 +22,7 @@ public enum ErrorMessage {
     PARKING_OBJECT_NAME_UN("Već postoji parkirni objekt sa zadanim imenom"),
 
     RESERVATION_PKEY("Već imate takvu rezervaciju"),
-    RESERVATION_CHECK("Vremenska razlika kraja i početka rezervacije mora biti djeljiva sa 30 minuta"),
+    RESERVATION_CHECK("Rezervacija može početi i završiti samo u puni sat ili puni sat + 30 minuta"),
 
     FK_RESERVATION_PARKING_OBJECT("Ne možete stvoriti rezervaciju za nepostojeći objekt"),
     FK_RESERVATION_VEHICLE("Ne možete stvoriti rezervaciju za nepostojeće vozilo");

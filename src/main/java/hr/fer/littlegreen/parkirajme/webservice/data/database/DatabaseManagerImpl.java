@@ -449,7 +449,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
         String queryPerson = """
         select first_name, last_name , credit_card_number , credit_card_expiration_date ,\s
-        au.user_uuid id, email, password_hash, role, oib, JSON_AGG(v2.registration_number) vehicles from person p\s
+        au.user_uuid id, email, password_hash, role, oib, ARRAY_AGG(v2.registration_number) vehicles from person p\s
         	join app_user au on au.user_uuid = p.person_uuid
         	join vehicle v2 on au.user_uuid = v2.person_uuid
         	group by first_name, last_name , credit_card_number , credit_card_expiration_date ,\s

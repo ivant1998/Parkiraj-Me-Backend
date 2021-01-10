@@ -448,13 +448,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
         List<User> registeredUsers = new ArrayList<>();
 
         String queryPerson = """
-        select first_name, last_name , credit_card_number , credit_card_expiration_date ,\s
-        au.user_uuid id, email, password_hash, role, oib, ARRAY_AGG(v2.registration_number) vehicles from person p\s
+        select au.user_uuid , email, role , oib, first_name , last_name,
+            credit_card_number , credit_card_expiration_date, vehicles
+        	from person p
         	join app_user au on au.user_uuid = p.person_uuid
-        	join vehicle v2 on au.user_uuid = v2.person_uuid
-        	group by first_name, last_name , credit_card_number , credit_card_expiration_date ,\s
-        au.user_uuid , email, password_hash, role, oib
-        ;
+        	join (select person_uuid , array_agg(registration_number) vehicles from vehicle
+        		group by person_uuid) as v2
+        	on au.user_uuid = v2.person_uuid;
         """;
         String queryCompany = "select * from company c join app_user au on au.user_uuid = c.company_uuid;";
         String queryAdministrator = "select * from app_user where role = 'a';";
@@ -466,7 +466,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             ResultSet rs = stmt.executeQuery(queryPerson);
             while (rs.next()) {
-                String id = rs.getString("id");
+                String id = rs.getString("user_uuid");
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
@@ -479,7 +479,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 for(var vehicle : vehiclesArray) {
                     vehicles.add(new Vehicle(vehicle));
                 }
-                //System.out.println(vehiclesArray);
                 registeredUsers.add(new Person(id,email,role,oib,firstName,lastName,creditCardNumber,creditCardExpirationDate,vehicles));
             }
 

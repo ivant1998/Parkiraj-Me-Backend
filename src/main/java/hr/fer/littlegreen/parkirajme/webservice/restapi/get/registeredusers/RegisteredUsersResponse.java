@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.get.registeredusers;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import org.springframework.lang.NonNull;

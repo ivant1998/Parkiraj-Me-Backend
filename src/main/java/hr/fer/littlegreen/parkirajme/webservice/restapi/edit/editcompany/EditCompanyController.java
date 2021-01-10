@@ -6,6 +6,7 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,14 +26,15 @@ public class EditCompanyController {
         this.tokenManager = tokenManager;
     }
 
-    @PatchMapping("/company")
+    @PatchMapping("/company/{companyId}")
     public ResponseEntity<Response> editCompany(
         @RequestBody EditCompanyRequestBody editCompanyRequestBody,
+        @PathVariable String companyId,
         @RequestHeader("Authentication-Token") String token
     ) {
 
         String id = tokenManager.getId(token);
-        if (id != null) {
+        if (id != null && companyId.equals(id)) {
             try {
                 databaseManager.editCompany(
                     id,

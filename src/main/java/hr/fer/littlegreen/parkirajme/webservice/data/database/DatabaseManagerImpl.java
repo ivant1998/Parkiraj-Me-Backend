@@ -1,6 +1,5 @@
 package hr.fer.littlegreen.parkirajme.webservice.data.database;
 
-import hr.fer.littlegreen.parkirajme.webservice.di.AppConfiguration;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Administrator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Company;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
@@ -9,6 +8,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
@@ -18,7 +18,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -27,15 +26,11 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("SqlResolve")
 public class DatabaseManagerImpl implements DatabaseManager {
@@ -647,5 +642,60 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
 
     }
+
+    @Override
+    public void editCompany(String uuid, String name, String headquarterAddress) {
+        Savepoint savepoint = null;
+        String query = """
+            BEGIN TRANSACTION;
+            update company
+            set name = ?,
+            headquarter_address = ?
+            where company_uuid = ?;
+            COMMIT TRANSACTION;
+            """;
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            savepoint = databaseConnection.setSavepoint();
+            stmt.setString(1, name);
+            stmt.setString(2, headquarterAddress);
+            stmt.setString(3, uuid);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Pogreška pri uređivanju podataka");
+        }
+    }
+
+    @Override
+    public void editParkingObject(String parkingObjectId, EditParkingObjectRequestBody editParkingObjectRequestBody) {
+
+        String query = """ 
+                BEGIN TRANSACTION;
+                UPDATE parking_object
+                SET capacity = ?, "30_minute_price" = ?, free_slots = ?
+                WHERE object_uuid = ?;
+                COMMIT TRANSACTION;
+            """;
+
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setInt(1, editParkingObjectRequestBody.getCapacity());
+            stmt.setInt(2, editParkingObjectRequestBody.getPrice());
+            stmt.setInt(3, editParkingObjectRequestBody.getFreeSlots());
+            stmt.setString(4, parkingObjectId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

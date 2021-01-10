@@ -4,6 +4,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
@@ -64,5 +65,18 @@ public interface DatabaseManager {
     void deleteReservation(ReservationDeleteRequestBody userId, String id);
 
     @Nullable
-    void editPerson(String uuid, String firstName, String lastName, String creditCardNumber, String creditCardExpirationDate);
+    void editPerson(
+        String uuid,
+        String firstName,
+        String lastName,
+        String creditCardNumber,
+        String creditCardExpirationDate
+    );
+
+    @Nullable
+    void editCompany(String uuid, String name, String headquarterAddress);
+
+    @Nullable
+    void editParkingObject(String parkingObjectId, EditParkingObjectRequestBody editParkingObjectRequestBody);
+
 }

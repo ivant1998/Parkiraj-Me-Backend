@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.getparkingobjects;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.get.getparkingobjects;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import org.springframework.http.HttpStatus;

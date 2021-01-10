@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.deleteuser;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.delete.deleteparkingobject;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DeleteUserController {
+public class CompanyDeleteParkingObjectController {
 
     @NonNull
     private final DatabaseManager databaseManager;
@@ -19,25 +19,26 @@ public class DeleteUserController {
     @NonNull
     private final TokenManager tokenManager;
 
-    public DeleteUserController(
-        DatabaseManager databaseManager,
-        TokenManager tokenManager
+    public CompanyDeleteParkingObjectController(
+        @NonNull DatabaseManager databaseManager,
+        @NonNull TokenManager tokenManager
     ) {
         this.databaseManager = databaseManager;
         this.tokenManager = tokenManager;
     }
 
-    @DeleteMapping("/user/{userId}")
-    public ResponseEntity<HttpStatus> deleteUser(
-        @PathVariable String userId,
-        @RequestHeader("Authentication-token") String token
+    @DeleteMapping("/parkingObject/{parkingObjectId}")
+    public ResponseEntity<HttpStatus> deleteParkingObject (
+        @PathVariable String parkingObjectId,
+        @RequestHeader("Authentication-Token") String token
     ) {
         var tokenId = tokenManager.getId(token);
+        String companyId = databaseManager.parkingObjectOwner(parkingObjectId);
         String role = databaseManager.getUserRole(tokenId);
 
-        if (tokenId != null && role != null) {
-            if (userId.equals(tokenId) || role.equals("a")) {
-                databaseManager.deleteUser(userId);
+        if(companyId != null && tokenId != null && role != null) {
+            if(companyId.equals(tokenId) || role.equals("a")) {
+                databaseManager.deleteParkingObject(parkingObjectId);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }

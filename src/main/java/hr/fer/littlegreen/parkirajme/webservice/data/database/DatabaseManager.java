@@ -64,5 +64,14 @@ public interface DatabaseManager {
     void deleteReservation(ReservationDeleteRequestBody userId, String id);
 
     @Nullable
-    void editPerson(String uuid, String firstName, String lastName, String creditCardNumber, String creditCardExpirationDate);
+    void editPerson(
+        String uuid,
+        String firstName,
+        String lastName,
+        String creditCardNumber,
+        String creditCardExpirationDate
+    );
+
+    @Nullable
+    void editCompany(String uuid, String name, String headquarterAddress);
 }

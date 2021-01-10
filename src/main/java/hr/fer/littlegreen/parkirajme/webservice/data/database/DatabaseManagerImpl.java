@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -446,7 +447,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
     public List<User> getRegisteredUsers() {
         List<User> registeredUsers = new ArrayList<>();
 
-        String queryPerson = "select * from person p join app_user au on au.user_uuid = p.person_uuid;";
+        String queryPerson = """
+        select first_name, last_name , credit_card_number , credit_card_expiration_date ,\s
+        au.user_uuid id, email, password_hash, role, oib, ARRAY_AGG(v2.registration_number) vehicles from person p\s
+        	join app_user au on au.user_uuid = p.person_uuid
+        	join vehicle v2 on au.user_uuid = v2.person_uuid
+        	group by first_name, last_name , credit_card_number , credit_card_expiration_date ,\s
+        au.user_uuid , email, password_hash, role, oib
+        ;
+        """;
         String queryCompany = "select * from company c join app_user au on au.user_uuid = c.company_uuid;";
         String queryAdministrator = "select * from app_user where role = 'a';";
         try (
@@ -457,7 +466,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             ResultSet rs = stmt.executeQuery(queryPerson);
             while (rs.next()) {
-                String id = rs.getString("user_uuid");
+                String id = rs.getString("id");
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
@@ -465,7 +474,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String lastName = rs.getString("last_name");
                 String creditCardNumber = rs.getString("credit_card_number");
                 YearMonth creditCardExpirationDate = YearMonth.from(rs.getDate("credit_card_expiration_date").toLocalDate());
-                List<Vehicle> vehicles = getVehicles(id);
+                var vehiclesArray = rs.getString("vehicles").replace("{","").replace("}","").split(",");
+                List<Vehicle> vehicles = new ArrayList<>();
+                for(var vehicle : vehiclesArray) {
+                    vehicles.add(new Vehicle(vehicle));
+                }
+                //System.out.println(vehiclesArray);
                 registeredUsers.add(new Person(id,email,role,oib,firstName,lastName,creditCardNumber,creditCardExpirationDate,vehicles));
             }
 

@@ -10,18 +10,15 @@ import java.util.concurrent.TimeUnit;
 
 public class Simulator {
 
-    private final Connection databaseConnection;
-
     public Simulator(Connection databaseConnection) {
-        this.databaseConnection = databaseConnection;
 
         String sql = """
             BEGIN TRANSACTION;
             update parking_object
-            set free_slots = (floor(random() * (capacity + 1))::int)::int;
+            set free_slots = (floor(random() * (capacity + 1)*0.8)::int)::int;
             COMMIT TRANSACTION;
             """;
-        Runnable simulateRunnable = () -> {
+        Runnable freeSlotsRunnable = () -> {
             Savepoint savepoint = null;
             try(PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
                 savepoint = databaseConnection.setSavepoint();
@@ -30,7 +27,6 @@ public class Simulator {
                 if (savepoint != null) {
                     try {
                         databaseConnection.rollback(savepoint);
-                        throw new IllegalArgumentException("Pogreška pri simuliranju free_slots!");
                     } catch (SQLException e2) {
                         e2.printStackTrace();
                     }
@@ -39,6 +35,6 @@ public class Simulator {
             }
         };
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-        exec.scheduleAtFixedRate(simulateRunnable , 0, 10, TimeUnit.SECONDS);
+        exec.scheduleAtFixedRate(freeSlotsRunnable , 0, 10, TimeUnit.SECONDS);
     }
 }

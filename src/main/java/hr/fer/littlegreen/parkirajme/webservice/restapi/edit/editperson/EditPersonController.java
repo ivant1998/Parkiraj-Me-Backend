@@ -6,6 +6,7 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +23,15 @@ public class EditPersonController {
         this.databaseManager = databaseManager;
     }
 
-    @PatchMapping("/person")
+    @PatchMapping("/person/{personId}")
     public ResponseEntity<Response> editPerson(
         @RequestBody EditPersonRequestBody editPersonRequestBody,
+        @PathVariable String personId,
         @RequestHeader("Authentication-Token") String token
-        ) {
+    ) {
 
         String id = tokenManager.getId(token);
-        if(id != null) {
+        if (id != null && personId.equals(id)) {
             try {
                 databaseManager.editPerson(
                     id,

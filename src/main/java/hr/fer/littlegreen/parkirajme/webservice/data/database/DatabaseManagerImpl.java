@@ -8,6 +8,7 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Vehicle;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
@@ -673,5 +674,28 @@ public class DatabaseManagerImpl implements DatabaseManager {
             throw new IllegalArgumentException("Pogreška pri uređivanju podataka");
         }
     }
+
+    @Override
+    public void editParkingObject(String parkingObjectId, EditParkingObjectRequestBody editParkingObjectRequestBody) {
+
+        String query = """ 
+                BEGIN TRANSACTION;
+                UPDATE parking_object
+                SET capacity = ?, "30_minute_price" = ?, free_slots = ?
+                WHERE object_uuid = ?;
+                COMMIT TRANSACTION;
+            """;
+
+        try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setInt(1, editParkingObjectRequestBody.getCapacity());
+            stmt.setInt(2, editParkingObjectRequestBody.getPrice());
+            stmt.setInt(3, editParkingObjectRequestBody.getFreeSlots());
+            stmt.setString(4, parkingObjectId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

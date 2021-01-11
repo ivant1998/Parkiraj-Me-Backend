@@ -56,15 +56,24 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public User checkLoginCredentials(@NonNull String inputEmail, @NonNull String inputPassword) {
-        var query = "SELECT * FROM app_user WHERE email = '%s';"
-            .formatted(inputEmail);
+        var query = """
+            select * from app_user au
+            left join company c on company_uuid = user_uuid
+            left join person p on person_uuid = user_uuid
+            left join administrator a2 on administrator_uuid = user_uuid
+            left join (select person_uuid ,array_agg(registration_number) vehicles from vehicle
+            		group by person_uuid) as v2
+            	on au.user_uuid = v2.person_uuid
+            where email = ?
+            """;
         try (
-            var statement = databaseConnection.createStatement(
+            var statement = databaseConnection.prepareStatement(
+                query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
+                ResultSet.CONCUR_READ_ONLY);
         ) {
-            var resultSet = statement.executeQuery(query);
+            statement.setString(1, inputEmail);
+            var resultSet = statement.executeQuery();
             if (resultSet.first()) {
                 String userUuid = resultSet.getString("user_uuid");
                 String email = resultSet.getString("email");
@@ -73,12 +82,23 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String oib = resultSet.getString("oib");
                 if (passwordEncoder.matches(inputPassword, passwordHash)) {
                     switch (role) {
-                    case ROLE_PERSON:
-                        return getPerson(userUuid, email, role, oib);
-                    case ROLE_COMPANY:
-                        return getCompany(userUuid, email, role, oib);
                     case ROLE_ADMINISTRATOR:
-                        return getAdministrator(userUuid, email, role, oib);
+                        return new Administrator(userUuid, email, role, oib);
+                    case ROLE_PERSON:
+                        String firstName = resultSet.getString("first_name");
+                        String lastName = resultSet.getString("last_name");
+                        String creditCardNumber = resultSet.getString("credit_card_number");
+                        Date creditCardExpirationDate = resultSet.getDate("credit_card_expiration_date");
+                        var vehiclesArray = resultSet.getString("vehicles").replace("{","").replace("}","").split(",");
+                        List<Vehicle> vehicles = new ArrayList<>();
+                        for(var vehicle : vehiclesArray) {
+                            vehicles.add(new Vehicle(vehicle));
+                        }
+                        return new Person(userUuid,email,role,oib,firstName,lastName,creditCardNumber,YearMonth.from(creditCardExpirationDate.toLocalDate()), vehicles);
+                    case ROLE_COMPANY:
+                        String name = resultSet.getString("name");
+                        String headquarterAddress = resultSet.getString("headquarter_address");
+                        return new Company(userUuid, email, role, oib, headquarterAddress, name);
                     }
                 }
             }

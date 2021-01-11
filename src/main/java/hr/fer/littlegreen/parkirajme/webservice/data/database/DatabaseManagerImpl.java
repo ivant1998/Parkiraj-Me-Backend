@@ -108,87 +108,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
-    private Person getPerson(String userUuid, String email, String role, String oib) {
-        var query = "SELECT * FROM person WHERE person_uuid = '%s';"
-            .formatted(userUuid);
-        try (
-            var statement = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
-            var resultSet = statement.executeQuery(query);
-            if (resultSet.first()) {
-                String firstName = resultSet.getString("first_name");
-                String lastName = resultSet.getString("last_name");
-                String creditCardNumber = resultSet.getString("credit_card_number");
-                Date creditCardExpirationDate = resultSet.getDate("credit_card_expiration_date");
-                return new Person(
-                    userUuid,
-                    email,
-                    role,
-                    oib,
-                    firstName,
-                    lastName,
-                    creditCardNumber,
-                    YearMonth.from(creditCardExpirationDate.toLocalDate()),
-                    getVehicles(userUuid)
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private List<Vehicle> getVehicles(String personUuid) {
-        var query = "SELECT registration_number FROM vehicle WHERE person_uuid = '%s';"
-            .formatted(personUuid);
-        try (
-            var statement = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
-            var resultSet = statement.executeQuery(query);
-            var vehicles = new ArrayList<Vehicle>();
-            while (resultSet.next()) {
-                String registrationNumber = resultSet.getString("registration_number");
-                vehicles.add(new Vehicle(registrationNumber));
-            }
-            return vehicles;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return List.of();
-    }
-
-    private Company getCompany(String userUuid, String email, String role, String oib) {
-        var query = "SELECT * FROM company WHERE company_uuid = '%s';"
-            .formatted(userUuid);
-        try (
-            var statement = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
-            var resultSet = statement.executeQuery(query);
-            if (resultSet.first()) {
-                String name = resultSet.getString("name");
-                String headquarterAddress = resultSet.getString("headquarter_address");
-                return new Company(userUuid, email, role, oib, headquarterAddress, name);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private Administrator getAdministrator(String userUuid, String email, String role, String oib) {
-        return new Administrator(userUuid, email, role, oib);
-    }
-
-
 
     @Override
     public String registerPerson(@NonNull RegisterPersonRequestBody registerPersonRequestBody) {
@@ -395,40 +314,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return list;
     }
 
-    @Override
-    public List<Reservation> getReservationsOnParking(String objectId) {
-        List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation where object_uuid = " + objectId + ";";
-        try (
-            Statement stmt = databaseConnection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY
-            )
-        ) {
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                String parkingId = rs.getString("object_uuid");
-                String registrationNumber = rs.getString("registration_number");
-                String personId = rs.getString("person_uuid");
-                Timestamp startTime = rs.getTimestamp("start_time");
-                Timestamp endTime = rs.getTimestamp("end_time");
-                Date expirationDate = rs.getDate("expiration_date");
-                short daysOfWeek = rs.getShort("days_in_week");
-                list.add(new Reservation(
-                    registrationNumber,
-                    personId,
-                    parkingId,
-                    expirationDate,
-                    startTime,
-                    endTime,
-                    daysOfWeek
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 
     @Override
     public boolean addReservation(ReservationRequestBody reservation, String userId) {
@@ -710,7 +595,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public void editParkingObject(String parkingObjectId, EditParkingObjectRequestBody editParkingObjectRequestBody) {
-
+        Savepoint savepoint = null;
         String query = """ 
                 BEGIN TRANSACTION;
                 UPDATE parking_object
@@ -720,15 +605,66 @@ public class DatabaseManagerImpl implements DatabaseManager {
             """;
 
         try (PreparedStatement stmt = databaseConnection.prepareStatement(query)) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.setInt(1, editParkingObjectRequestBody.getCapacity());
             stmt.setInt(2, editParkingObjectRequestBody.getPrice());
             stmt.setInt(3, editParkingObjectRequestBody.getFreeSlots());
             stmt.setString(4, parkingObjectId);
             stmt.executeUpdate();
         } catch (SQLException e) {
+            if(savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                } catch(SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
     }
 
+
+    @Override
+    public void deleteVehicle(String ownerId, String registrationNumber) {
+        String query = """
+            BEGIN TRANSACTION;
+            DELETE FROM vehicle WHERE person_uuid = ? AND registration_number = ?;
+            COMMIT TRANSACTION;
+           """;
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, ownerId);
+            stmt.setString(2, registrationNumber);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addVehicle(String ownerId, String registrationNumber) {
+        Savepoint savepoint = null;
+        String query = """
+            BEGIN TRANSACTION;
+            insert into vehicle (person_uuid, registration_number)
+            values (?, ?);
+            COMMIT TRANSACTION;
+            """;
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            savepoint = databaseConnection.setSavepoint();
+            stmt.setString(1, ownerId);
+            stmt.setString(2, registrationNumber);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            if (savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException(ErrorMessage.getMessage(e));
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        }
+    }
 
 }

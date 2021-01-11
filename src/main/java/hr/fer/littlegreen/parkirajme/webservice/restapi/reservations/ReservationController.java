@@ -51,23 +51,6 @@ public class ReservationController {
 
     }
 
-    @GetMapping("/parkingObject/{objectId}/users")
-    public ResponseEntity<List<Reservation>> reservationsOnParking(
-        @PathVariable String objectId,
-        @RequestHeader("Authentication-Token") String token
-    ) {
-        var companyTokenId = tokenManager.getId(token);
-        if (companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
-        String role = databaseManager.getUserRole(objectId);
-        if (!role.equals("c")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
-
-        if (companyTokenId.equals(objectId)) {
-            var objects = databaseManager.getReservationsOnParking(companyTokenId);
-            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-
-    }
 
     @PostMapping("/user/addReservation")
     public ResponseEntity<HttpStatus> addReservation(

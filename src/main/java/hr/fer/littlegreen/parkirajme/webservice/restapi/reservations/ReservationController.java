@@ -59,10 +59,16 @@ public class ReservationController {
         var companyTokenId = tokenManager.getId(token);
         String role = databaseManager.getUserRole(companyTokenId);
         if (!role.equals("c") || companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
-
-        var objects = databaseManager.getReservationsOnParking(objectId);
-        if (objects != null) {
-            return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
+        var parkingObjs = databaseManager.getCompanyParkingObjects(companyTokenId);
+        for (var obj : parkingObjs) {
+            if (obj.getObjectUuid().equals(objectId)) {
+                var objects = databaseManager.getReservationsOnParking(objectId);
+                if (objects != null) {
+                    return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+                }
+            }
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 

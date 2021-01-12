@@ -79,7 +79,7 @@ public class ReservationController {
         if (userId != null) {
             try {
                 String id = databaseManager.addReservation(reservation, userId);
-                return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK);
+                if (id != null) { return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK); }
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.CONFLICT);
             }
@@ -90,7 +90,6 @@ public class ReservationController {
     @DeleteMapping("/reservation/{reservationId}")
     public ResponseEntity<HttpStatus> deleteReservation(
         @PathVariable String reservationId,
-        @RequestBody ReservationDeleteRequestBody reservation,
         @RequestHeader("Authentication-token") String token
     ) {
         var userId = tokenManager.getId(token);
@@ -98,7 +97,7 @@ public class ReservationController {
 
         if (userId != null && role != null) {
             if (role.equals("p")) {
-                databaseManager.deleteReservation(reservation, userId);
+                databaseManager.deleteReservation(reservationId, userId);
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
         }

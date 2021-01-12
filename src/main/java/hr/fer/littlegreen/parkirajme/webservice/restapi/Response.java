@@ -12,6 +12,6 @@ public class Response {
     }
 
     @Nullable
-    protected String getError() {return error;}
+    public String getError() {return error;}
 
 }

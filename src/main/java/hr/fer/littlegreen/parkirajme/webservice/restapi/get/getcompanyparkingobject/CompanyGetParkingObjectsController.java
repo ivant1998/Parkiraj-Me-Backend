@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.getcompanyparkingobject;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.get.getcompanyparkingobject;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;

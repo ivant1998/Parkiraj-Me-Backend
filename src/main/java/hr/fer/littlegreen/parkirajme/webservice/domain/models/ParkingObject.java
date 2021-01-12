@@ -34,23 +34,23 @@ public final class ParkingObject {
     public ParkingObject(
         @NonNull String objectUuid,
         @NonNull String companyUuid,
-        int freeSlots,
         int thirtyMinutePrice,
-        int capacity,
         @NonNull String address,
         @NonNull String name,
+        int capacity,
         @NonNull BigDecimal latitude,
-        @NonNull BigDecimal longitude
+        @NonNull BigDecimal longitude,
+        int freeSlots
     ) {
         this.objectUuid = objectUuid;
         this.companyUuid = companyUuid;
-        this.freeSlots = freeSlots;
         this.thirtyMinutePrice = thirtyMinutePrice;
-        this.capacity = capacity;
         this.address = address;
         this.name = name;
+        this.capacity = capacity;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.freeSlots = freeSlots;
     }
 
     @NonNull

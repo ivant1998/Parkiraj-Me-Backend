@@ -2,6 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.di;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManagerImpl;
+import hr.fer.littlegreen.parkirajme.webservice.data.database.Simulator;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManagerImpl;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,11 @@ public class AppConfiguration {
     }
 
     @Bean
+    public Simulator provideSimulator() {
+        return new Simulator(provideDatabaseConnection());
+    }
+
+    @Bean
     public Connection provideDatabaseConnection() {
         Connection conn = null;
         try {
@@ -47,7 +53,5 @@ public class AppConfiguration {
     }
 
     @Bean
-    public PasswordEncoder providePasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    public PasswordEncoder providePasswordEncoder() { return new BCryptPasswordEncoder(); }
 }

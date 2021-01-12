@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.getcompanyparkingobject;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.get.getcompanyparkingobject;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import org.springframework.lang.NonNull;

@@ -7,7 +7,6 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.Company
 import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

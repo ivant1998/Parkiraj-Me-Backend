@@ -403,20 +403,20 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public boolean addReservation(ReservationRequestBody reservation, String userId) {
+    public String addReservation(ReservationRequestBody reservation, String userId) {
         Savepoint savepoint = null;
-        String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + reservation.getParkingId()
+        String reservation_uuid = UUID.randomUUID().toString().replace("-", ""); ;
+        String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + userId
             + "', '"
-            + userId + "', '"
-            + reservation.getRegistrationNumber() + "', '"
-            + reservation.getStartTime() + "', '"
-            + reservation.getEndTime() + "', '"
+            + reservation.getParkingId() + "', '"
             + reservation.getDaysOfWeek() + "', '"
-            + reservation.getExpirationDate() + "');" + "COMMIT TRANSACTION;";
+            + reservation_uuid + "', '"
+            + reservation.getStartTime() + "', '"
+            + reservation.getEndTime() + "');" + "COMMIT TRANSACTION;";
         try (Statement stmt = databaseConnection.createStatement()) {
             savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
-            return true;
+            return reservation_uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
                 try {
@@ -428,7 +428,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             }
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     @NonNull

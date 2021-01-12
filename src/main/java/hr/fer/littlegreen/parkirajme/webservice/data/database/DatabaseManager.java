@@ -58,7 +58,7 @@ public interface DatabaseManager {
     List<Reservation> getReservationsOnParking(@NonNull String companyId);
 
     @Nullable
-    boolean addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
+    String addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
 
     @Nullable
     void deleteReservation(ReservationDeleteRequestBody userId, String id);

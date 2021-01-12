@@ -1,7 +1,6 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class ReservationController {
@@ -60,11 +57,11 @@ public class ReservationController {
         @RequestHeader("Authentication-Token") String token
     ) {
         var companyTokenId = tokenManager.getId(token);
-        String role = databaseManager.getUserRole(objectId);
+        String role = databaseManager.getUserRole(companyTokenId);
         if (!role.equals("c") || companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
-        if (companyTokenId.equals(objectId)) {
-            List<Reservation> objects = databaseManager.getReservationsOnParking(companyTokenId);
+        var objects = databaseManager.getReservationsOnParking(objectId);
+        if (objects != null) {
             return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

@@ -54,7 +54,7 @@ public class ReservationController {
     }
 
     @GetMapping("/parkingObject/{objectId}/users")
-    public ResponseEntity<List<Reservation>> reservationsOnParking(
+    public ResponseEntity<ReservationListResponse> reservationsOnParking(
         @PathVariable String objectId,
         @RequestHeader("Authentication-Token") String token
     ) {
@@ -64,7 +64,7 @@ public class ReservationController {
 
         if (companyTokenId.equals(objectId)) {
             var objects = databaseManager.getReservationsOnParking(companyTokenId);
-            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
+            return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 

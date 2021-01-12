@@ -27,6 +27,9 @@ public interface DatabaseManager {
     @Nullable
     List<ParkingObject> getParkingObjects();
 
+    @Nullable
+    ParkingObject getParkingObject(@NonNull String objectUuid);
+
     @NonNull
     List<User> getRegisteredUsers();
 

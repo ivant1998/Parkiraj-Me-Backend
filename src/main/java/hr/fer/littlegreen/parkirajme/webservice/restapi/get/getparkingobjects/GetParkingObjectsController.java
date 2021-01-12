@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -26,4 +27,18 @@ public class GetParkingObjectsController {
         return new ResponseEntity<>(new GetParkingObjectsResponse(objects), HttpStatus.OK);
     }
 
+    @GetMapping("/parkingObjects/{objectUuid}")
+    public ResponseEntity<GetParkingObjectResponse> getParkingObject(
+        @PathVariable("objectUuid") String objectUuid
+    ) {
+        var object = databaseManager.getParkingObject(objectUuid);
+        if (object != null) {
+            return new ResponseEntity<>(new GetParkingObjectResponse(null, object), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(
+                new GetParkingObjectResponse("Objekt nije pronađen.", null),
+                HttpStatus.CONFLICT
+            );
+        }
+    }
 }

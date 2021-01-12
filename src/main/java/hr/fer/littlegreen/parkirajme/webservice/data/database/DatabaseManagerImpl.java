@@ -27,12 +27,12 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 
+@SuppressWarnings("SqlResolve")
 public class DatabaseManagerImpl implements DatabaseManager {
 
     private static final String ROLE_PERSON = "p";
@@ -241,6 +241,44 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
+    public ParkingObject getParkingObject(String objectUuid) {
+        String query = "select * from parking_object where object_uuid = '%s';".formatted(objectUuid);
+        try (
+            Statement stmt = databaseConnection.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            )
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.first()) {
+                String id = rs.getString("object_uuid");
+                String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
+                String address = rs.getString("address");
+                String name = rs.getString("object_name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+                return new ParkingObject(
+                    id,
+                    companyId,
+                    price,
+                    address,
+                    name,
+                    capacity,
+                    latitude,
+                    longitude,
+                    freeSlots
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public String addParkingObject(
         @NonNull CompanyAddParkingObjectRequestBody parkingObject,
         @NonNull String companyUuid
@@ -377,22 +415,20 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
 
-
-
     @NonNull
     @Override
     public List<User> getRegisteredUsers() {
         List<User> registeredUsers = new ArrayList<>();
 
         String queryPerson = """
-        select au.user_uuid , email, role , oib, first_name , last_name,
-            credit_card_number , credit_card_expiration_date, vehicles
-        	from person p
-        	join app_user au on au.user_uuid = p.person_uuid
-        	join (select person_uuid , array_agg(registration_number) vehicles from vehicle
-        		group by person_uuid) as v2
-        	on au.user_uuid = v2.person_uuid;
-        """;
+            select au.user_uuid , email, role , oib, first_name , last_name,
+                credit_card_number , credit_card_expiration_date, vehicles
+            	from person p
+            	join app_user au on au.user_uuid = p.person_uuid
+            	join (select person_uuid , array_agg(registration_number) vehicles from vehicle
+            		group by person_uuid) as v2
+            	on au.user_uuid = v2.person_uuid;
+            """;
         String queryCompany = "select * from company c join app_user au on au.user_uuid = c.company_uuid;";
         String queryAdministrator = "select * from app_user where role = 'a';";
         try (
@@ -658,10 +694,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public void deleteVehicle(String ownerId, String registrationNumber) {
         String query = """
-            BEGIN TRANSACTION;
-            DELETE FROM vehicle WHERE person_uuid = ? AND registration_number = ?;
-            COMMIT TRANSACTION;
-           """;
+             BEGIN TRANSACTION;
+             DELETE FROM vehicle WHERE person_uuid = ? AND registration_number = ?;
+             COMMIT TRANSACTION;
+            """;
         try (var stmt = databaseConnection.prepareStatement(query)) {
             stmt.setString(1, ownerId);
             stmt.setString(2, registrationNumber);

@@ -1,20 +1,25 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 
 public class ReservationListResponse {
 
-    @NonNull
-    List<Reservation> reservations;
+    @Nullable
+    private final List<Reservation> reservations;
 
     public ReservationListResponse(
-        @NonNull List<Reservation> reservations
+        @Nullable List<Reservation> reservations
     ) {
         this.reservations = reservations;
+    }
+
+    @Nullable
+    public List<Reservation> getReservations() {
+        return reservations;
     }
 
     @Override

@@ -10,17 +10,11 @@ public class Reservation {
     @NonNull
     private final String reservationId;
 
-    //@NonNull
-    //private final String registrationNumber;
-
     @NonNull
     private final String userUuid;
 
     @NonNull
     private final String objectUuid;
-
-    //@NonNull
-    //private final Date expirationDate;
 
     @NonNull
     private final Timestamp startTime;

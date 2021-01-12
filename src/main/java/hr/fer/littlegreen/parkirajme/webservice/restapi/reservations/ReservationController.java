@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class ReservationController {
@@ -36,7 +35,7 @@ public class ReservationController {
 
 
     @GetMapping("/user/{userId}/reservations")
-    public ResponseEntity<List<Reservation>> getUserReservations(
+    public ResponseEntity<ReservationListResponse> getUserReservations(
         @PathVariable String userId,
         @RequestHeader("Authentication-Token") String token
     ) {
@@ -47,7 +46,9 @@ public class ReservationController {
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
-            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
+            if (objects != null) {
+                return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
+            }
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
@@ -63,7 +64,7 @@ public class ReservationController {
         if (!role.equals("c") || companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (companyTokenId.equals(objectId)) {
-            var objects = databaseManager.getReservationsOnParking(companyTokenId);
+            List<Reservation> objects = databaseManager.getReservationsOnParking(companyTokenId);
             return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

@@ -337,7 +337,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<Reservation> getUserParkingReservations(String userId) {
         List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation where person_uuid = " + userId + ";";
+        String query = "select * from reservation where person_uuid = '" + userId + "';";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -346,20 +346,20 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
+                String reservationId = rs.getString("reservation_uuid");
                 String parkingId = rs.getString("object_uuid");
-                String registrationNumber = rs.getString("registration_number");
                 String personId = rs.getString("person_uuid");
                 Timestamp startTime = rs.getTimestamp("start_time");
                 Timestamp endTime = rs.getTimestamp("end_time");
-                Date expirationDate = rs.getDate("expiration_date");
-                short daysOfWeek = rs.getShort("days_in_week");
-                list.add(new Reservation(registrationNumber,
+                String daysOfWeek = rs.getString("days_in_week");
+                list.add(new Reservation(
+                    reservationId,
                     personId,
                     parkingId,
-                    expirationDate,
                     startTime,
                     endTime,
-                    daysOfWeek));
+                    daysOfWeek
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -379,18 +379,18 @@ public class DatabaseManagerImpl implements DatabaseManager {
         ) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
+                String reservationId = rs.getString("reservation_uuid");
                 String parkingId = rs.getString("object_uuid");
                 String registrationNumber = rs.getString("registration_number");
                 String personId = rs.getString("person_uuid");
                 Timestamp startTime = rs.getTimestamp("start_time");
                 Timestamp endTime = rs.getTimestamp("end_time");
                 Date expirationDate = rs.getDate("expiration_date");
-                short daysOfWeek = rs.getShort("days_in_week");
+                String daysOfWeek = rs.getString("days_in_week");
                 list.add(new Reservation(
-                    registrationNumber,
+                    reservationId,
                     personId,
                     parkingId,
-                    expirationDate,
                     startTime,
                     endTime,
                     daysOfWeek

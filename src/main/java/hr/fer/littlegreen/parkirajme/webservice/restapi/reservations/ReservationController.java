@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
 
+@RestController
 public class ReservationController {
 
     @NonNull
@@ -39,10 +41,9 @@ public class ReservationController {
         @RequestHeader("Authentication-Token") String token
     ) {
         var userTokenId = tokenManager.getId(token);
-        if (userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(userId);
-        assert role != null;
-        if (!role.equals("p")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        if (!role.equals("p") || userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
@@ -58,10 +59,8 @@ public class ReservationController {
         @RequestHeader("Authentication-Token") String token
     ) {
         var companyTokenId = tokenManager.getId(token);
-        if (companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(objectId);
-        assert role != null;
-        if (!role.equals("c")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        if (!role.equals("c") || companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
 
         if (companyTokenId.equals(objectId)) {
             var objects = databaseManager.getReservationsOnParking(companyTokenId);

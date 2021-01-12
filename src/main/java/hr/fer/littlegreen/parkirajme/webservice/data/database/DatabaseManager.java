@@ -4,9 +4,10 @@ import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.User;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.CompanyAddParkingObjectRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.registeredusers.RegisteredUser;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -55,8 +56,27 @@ public interface DatabaseManager {
     List<Reservation> getUserParkingReservations(@NonNull String userId);
 
     @Nullable
-    List<Reservation> getReservationsOnParking(@NonNull String companyId);
+    boolean addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
 
     @Nullable
-    String addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
+    void deleteReservation(ReservationDeleteRequestBody userId, String id);
+
+    @Nullable
+    void editPerson(
+        String uuid,
+        String firstName,
+        String lastName,
+        String creditCardNumber,
+        String creditCardExpirationDate
+    );
+
+    @Nullable
+    void editCompany(String uuid, String name, String headquarterAddress);
+
+    @Nullable
+    void editParkingObject(String parkingObjectId, EditParkingObjectRequestBody editParkingObjectRequestBody);
+
+    void deleteVehicle(String ownerId, String registrationNumber);
+
+    void addVehicle(String ownerId, String registrationNumber);
 }

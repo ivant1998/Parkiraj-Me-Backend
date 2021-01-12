@@ -1,4 +1,4 @@
-package hr.fer.littlegreen.parkirajme.webservice.restapi.getclosestparkingobject;
+package hr.fer.littlegreen.parkirajme.webservice.restapi.get.getclosestparkingobject;
 
 import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import org.springframework.lang.NonNull;

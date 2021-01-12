@@ -7,7 +7,6 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.Company
 import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
-import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationDeleteRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -56,10 +55,13 @@ public interface DatabaseManager {
     List<Reservation> getUserParkingReservations(@NonNull String userId);
 
     @Nullable
-    boolean addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
+    List<Reservation> getReservationsOnParking(@NonNull String companyId);
 
     @Nullable
-    void deleteReservation(ReservationDeleteRequestBody userId, String id);
+    String addReservation(@NonNull ReservationRequestBody reservation, @NonNull String userId);
+
+    @Nullable
+    void deleteReservation(String reservationId, String userId);
 
     @Nullable
     void editPerson(

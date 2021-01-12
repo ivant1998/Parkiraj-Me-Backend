@@ -2,9 +2,7 @@ package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import org.springframework.lang.NonNull;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.BitSet;
 import java.util.Objects;
 
 public class ReservationRequestBody {
@@ -16,30 +14,20 @@ public class ReservationRequestBody {
     private final Timestamp endTime;
 
     @NonNull
-    private final Date expirationDate;
-
-    @NonNull
-    private final BitSet daysOfWeek;
-
-    @NonNull
-    private final String registrationNumber;
+    private final String daysOfWeek;
 
     @NonNull
     private final String parkingId;
 
     public ReservationRequestBody(
-        @NonNull Timestamp startTime,
-        @NonNull Timestamp endTime,
-        @NonNull Date expirationDate,
-        @NonNull BitSet daysOfWeek,
-        @NonNull String registrationNumber,
+        @NonNull String startTime,
+        @NonNull String endTime,
+        @NonNull String daysOfWeek,
         @NonNull String parkingId
     ) {
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.expirationDate = expirationDate;
+        this.startTime = Timestamp.valueOf(startTime);
+        this.endTime = Timestamp.valueOf(endTime);
         this.daysOfWeek = daysOfWeek;
-        this.registrationNumber = registrationNumber;
         this.parkingId = parkingId;
     }
 
@@ -54,17 +42,8 @@ public class ReservationRequestBody {
     }
 
     @NonNull
-    public Date getExpirationDate() {
-        return expirationDate;
-    }
-
-    public BitSet getDaysOfWeek() {
+    public String getDaysOfWeek() {
         return daysOfWeek;
-    }
-
-    @NonNull
-    public String getRegistrationNumber() {
-        return registrationNumber;
     }
 
     @NonNull
@@ -80,13 +59,11 @@ public class ReservationRequestBody {
         return daysOfWeek == that.daysOfWeek &&
             startTime.equals(that.startTime) &&
             endTime.equals(that.endTime) &&
-            expirationDate.equals(that.expirationDate) &&
-            registrationNumber.equals(that.registrationNumber) &&
             parkingId.equals(that.parkingId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startTime, endTime, expirationDate, daysOfWeek, registrationNumber, parkingId);
+        return Objects.hash(startTime, endTime, daysOfWeek, parkingId);
     }
 }

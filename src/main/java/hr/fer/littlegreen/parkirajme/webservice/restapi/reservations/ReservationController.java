@@ -1,7 +1,6 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
-import hr.fer.littlegreen.parkirajme.webservice.domain.models.Reservation;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Objects;
-
+@RestController
 public class ReservationController {
 
     @NonNull
@@ -34,36 +32,60 @@ public class ReservationController {
 
 
     @GetMapping("/user/{userId}/reservations")
-    public ResponseEntity<List<Reservation>> getUserReservations(
+    public ResponseEntity<ReservationListResponse> getUserReservations(
         @PathVariable String userId,
         @RequestHeader("Authentication-Token") String token
     ) {
         var userTokenId = tokenManager.getId(token);
-        if (userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
         String role = databaseManager.getUserRole(userId);
-        if (!role.equals("p")) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        if (!role.equals("p") || userTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+
 
         if (userTokenId.equals(userId)) {
             var objects = databaseManager.getUserParkingReservations(userId);
-            return new ResponseEntity<>(Objects.requireNonNullElseGet(objects, List::of), HttpStatus.OK);
+            if (objects != null) {
+                return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
+            }
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
     }
 
+    @GetMapping("/parkingObject/{objectId}/users")
+    public ResponseEntity<ReservationListResponse> reservationsOnParking(
+        @PathVariable String objectId,
+        @RequestHeader("Authentication-Token") String token
+    ) {
+        var companyTokenId = tokenManager.getId(token);
+        String role = databaseManager.getUserRole(companyTokenId);
+        if (!role.equals("c") || companyTokenId == null) { return new ResponseEntity<>(null, HttpStatus.FORBIDDEN); }
+        var parkingObjs = databaseManager.getCompanyParkingObjects(companyTokenId);
+        for (var obj : parkingObjs) {
+            if (obj.getObjectUuid().equals(objectId)) {
+                var objects = databaseManager.getReservationsOnParking(objectId);
+                if (objects != null) {
+                    return new ResponseEntity<>(new ReservationListResponse(objects), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+                }
+            }
+        }
+        return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+    }
 
     @PostMapping("/user/addReservation")
-    public ResponseEntity<HttpStatus> addReservation(
+    public ResponseEntity<ReservationResponse> addReservation(
         @RequestBody ReservationRequestBody reservation,
         @RequestHeader("Authentication-Token") String token
     ) {
         var userId = tokenManager.getId(token);
         if (userId != null) {
             try {
-                boolean id = databaseManager.addReservation(reservation, userId);
-                if (id) { return new ResponseEntity<>(null, HttpStatus.OK); }
+                String id = databaseManager.addReservation(reservation, userId);
+                if (id != null) { return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK); }
             } catch (IllegalArgumentException ex) {
-                return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(null, HttpStatus.CONFLICT);
             }
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -72,7 +94,6 @@ public class ReservationController {
     @DeleteMapping("/reservation/{reservationId}")
     public ResponseEntity<HttpStatus> deleteReservation(
         @PathVariable String reservationId,
-        @RequestBody ReservationDeleteRequestBody reservation,
         @RequestHeader("Authentication-token") String token
     ) {
         var userId = tokenManager.getId(token);
@@ -80,7 +101,7 @@ public class ReservationController {
 
         if (userId != null && role != null) {
             if (role.equals("p")) {
-                databaseManager.deleteReservation(reservation, userId);
+                databaseManager.deleteReservation(reservationId, userId);
                 return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
         }

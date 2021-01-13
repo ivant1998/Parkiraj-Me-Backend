@@ -256,14 +256,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public ParkingObject getParkingObject(String objectUuid) {
-        String query = "select * from parking_object where object_uuid = '%s';".formatted(objectUuid);
+        String query = "select * from parking_object where object_uuid = ?;";
         try (
-            Statement stmt = databaseConnection.createStatement(
+            var stmt = databaseConnection.prepareStatement(query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
+            stmt.setString(1, objectUuid);
+            ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 String id = rs.getString("object_uuid");
                 String companyId = rs.getString("company_uuid");
@@ -335,14 +336,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<ReservationAndParkingObjectPair> getUserParkingReservations(@NonNull String userId) {
         List<ReservationAndParkingObjectPair> list = new LinkedList<>();
-        String query = "select * from reservation natural join parking_object where person_uuid = '" + userId + "';";
+        String query = "select * from reservation natural join parking_object where person_uuid = ?;";
         try (
-            Statement stmt = databaseConnection.createStatement(
+            var stmt = databaseConnection.prepareStatement(query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String reservationId = rs.getString("reservation_uuid");
                 String parkingId = rs.getString("object_uuid");
@@ -391,14 +393,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<ReservationAndParkingObjectPair> getReservationsOnParking(@NonNull String objectId) {
         List<ReservationAndParkingObjectPair> list = new LinkedList<>();
-        String query = "select * from reservation natural join parking_object where object_uuid = '" + objectId + "';";
+        String query = "select * from reservation natural join parking_object where object_uuid = ?;";
         try (
-            Statement stmt = databaseConnection.createStatement(
+            var stmt = databaseConnection.prepareStatement(query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
+            stmt.setString(1, objectId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String reservationId = rs.getString("reservation_uuid");
                 String parkingId = rs.getString("object_uuid");
@@ -452,19 +455,18 @@ public class DatabaseManagerImpl implements DatabaseManager {
         var query = ("""
             BEGIN TRANSACTION;
             INSERT INTO reservation(reservation_uuid, person_uuid, object_uuid, days_in_week, start_time, end_time)
-            VALUES('%s', '%s', '%s', '%s'::BIT(7), '%s'::TIMESTAMP(0), '%s'::TIMESTAMP(0));
+            VALUES(?, ?, ?, ?::BIT(7), ?::TIMESTAMP(0), ?::TIMESTAMP(0));
             COMMIT TRANSACTION;
-            """).formatted(
-            reservation_uuid,
-            userId,
-            reservation.getParkingId(),
-            reservation.getDaysOfWeek(),
-            reservation.getStartTime(),
-            reservation.getEndTime()
-        );
-        try (Statement stmt = databaseConnection.createStatement()) {
+            """);
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, reservation_uuid);
+            stmt.setString(2, userId);
+            stmt.setString(3, reservation.getParkingId());
+            stmt.setString(4, reservation.getDaysOfWeek());
+            stmt.setTimestamp(5, reservation.getStartTime());
+            stmt.setTimestamp(6, reservation.getEndTime());
             savepoint = databaseConnection.setSavepoint();
-            stmt.executeUpdate(query);
+            stmt.executeUpdate();
             return reservation_uuid;
         } catch (SQLException e) {
             if (savepoint != null) {
@@ -579,14 +581,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<ParkingObject> getCompanyParkingObjects(@NonNull String companyId) {
         List<ParkingObject> list = new LinkedList<>();
-        String query = "SELECT * FROM parking_object WHERE company_uuid = '" + companyId + "';";
+        String query = "SELECT * FROM parking_object WHERE company_uuid = ?;";
         try (
-            Statement stmt = databaseConnection.createStatement(
+            var stmt = databaseConnection.prepareStatement(query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY
             )
         ) {
-            ResultSet rs = stmt.executeQuery(query);
+            stmt.setString(1, companyId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String id = rs.getString("object_uuid");
                 int freeSlots = rs.getInt("free_slots");
@@ -633,11 +636,15 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public void deleteParkingObject(@NonNull String parkingObjectId) {
-        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM parking_object WHERE object_uuid = '"
-            + parkingObjectId + "';" + "COMMIT TRANSACTION;";
+        String query = """
+            BEGIN TRANSACTION;
+            DELETE FROM parking_object WHERE object_uuid = ?;
+            COMMIT TRANSACTION;
+            """;
 
-        try (Statement stmt = databaseConnection.createStatement()) {
-            stmt.executeUpdate(query);
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, parkingObjectId);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -645,11 +652,14 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public void deleteUser(@NonNull String userId) {
-        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM app_user WHERE user_uuid = '"
-            + userId + "';" + "COMMIT TRANSACTION;";
+        String query = """
+            BEGIN TRANSACTION;
+            DELETE FROM app_user WHERE user_uuid = ?;
+            COMMIT TRANSACTION;""";
 
-        try (Statement stmt = databaseConnection.createStatement()) {
-            stmt.executeUpdate(query);
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -657,11 +667,17 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public void deleteReservation(String reservationId, String userId) {
-        String query = "BEGIN TRANSACTION;\n" + "DELETE FROM reservation WHERE person_uuid = '"
-            + userId + "'AND reservation_uuid='" + reservationId + "';" + "COMMIT TRANSACTION;";
+        String query = """
+            BEGIN TRANSACTION;
+            DELETE FROM reservation WHERE person_uuid = ? 
+            AND reservation_uuid = ?;
+            COMMIT TRANSACTION;
+            """;
 
-        try (Statement stmt = databaseConnection.createStatement()) {
-            stmt.executeUpdate(query);
+        try (var stmt = databaseConnection.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            stmt.setString(2, reservationId);
+            stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

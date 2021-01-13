@@ -43,6 +43,11 @@ public class Reservation {
     }
 
     @NonNull
+    public String getReservationId() {
+        return reservationId;
+    }
+
+    @NonNull
     public String getUserUuid() {
         return userUuid;
     }

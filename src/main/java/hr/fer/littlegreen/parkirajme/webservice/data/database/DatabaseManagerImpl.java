@@ -69,7 +69,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
             var statement = databaseConnection.prepareStatement(
                 query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY);
+                ResultSet.CONCUR_READ_ONLY
+            );
         ) {
             statement.setString(1, inputEmail);
             var resultSet = statement.executeQuery();
@@ -88,12 +89,26 @@ public class DatabaseManagerImpl implements DatabaseManager {
                         String lastName = resultSet.getString("last_name");
                         String creditCardNumber = resultSet.getString("credit_card_number");
                         Date creditCardExpirationDate = resultSet.getDate("credit_card_expiration_date");
-                        var vehiclesArray = resultSet.getString("vehicles").replace("{","").replace("}","").split(",");
+                        var vehiclesArray = resultSet
+                            .getString("vehicles")
+                            .replace("{", "")
+                            .replace("}", "")
+                            .split(",");
                         List<Vehicle> vehicles = new ArrayList<>();
-                        for(var vehicle : vehiclesArray) {
+                        for (var vehicle : vehiclesArray) {
                             vehicles.add(new Vehicle(vehicle));
                         }
-                        return new Person(userUuid,email,role,oib,firstName,lastName,creditCardNumber,YearMonth.from(creditCardExpirationDate.toLocalDate()), vehicles);
+                        return new Person(
+                            userUuid,
+                            email,
+                            role,
+                            oib,
+                            firstName,
+                            lastName,
+                            creditCardNumber,
+                            YearMonth.from(creditCardExpirationDate.toLocalDate()),
+                            vehicles
+                        );
                     case ROLE_COMPANY:
                         String name = resultSet.getString("name");
                         String headquarterAddress = resultSet.getString("headquarter_address");
@@ -138,7 +153,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.setDate(8, Date.valueOf(registerPersonRequestBody.getCreditCardExpirationDate() + "-01"));
             stmt.setString(9, uuid);
             int i = 10;
-            for(var regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
+            for (var regPlate : registerPersonRequestBody.getRegistrationNumbers()) {
                 stmt.setString(i++, regPlate);
                 stmt.setString(i++, uuid);
             }
@@ -154,7 +169,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 }
             }
             e.printStackTrace();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new IllegalArgumentException("Pogreška pri registraciji");
         }
         return null;
@@ -321,7 +336,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     @Override
     public List<Reservation> getUserParkingReservations(String userId) {
         List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation where person_uuid = " + userId + ";";
+        String query = "select * from reservation where person_uuid = '" + userId + "';";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -389,13 +404,19 @@ public class DatabaseManagerImpl implements DatabaseManager {
     public String addReservation(ReservationRequestBody reservation, String userId) {
         Savepoint savepoint = null;
         String reservation_uuid = UUID.randomUUID().toString().replace("-", "");
-        String query = "BEGIN TRANSACTION;\n" + "insert into reservation values ('" + userId
-            + "', '"
-            + reservation.getParkingId() + "', '"
-            + reservation.getDaysOfWeek() + "', '"
-            + reservation_uuid + "', '"
-            + reservation.getStartTime() + "', '"
-            + reservation.getEndTime() + "');" + "COMMIT TRANSACTION;";
+        var query = ("""
+            BEGIN TRANSACTION;
+            INSERT INTO reservation(reservation_uuid, person_uuid, object_uuid, days_in_week, start_time, end_time)
+            VALUES('%s', '%s', '%s', '%s'::BIT(7), '%s'::TIMESTAMP(0), '%s'::TIMESTAMP(0));
+            COMMIT TRANSACTION;
+            """).formatted(
+            reservation_uuid,
+            userId,
+            reservation.getParkingId(),
+            reservation.getDaysOfWeek(),
+            reservation.getStartTime(),
+            reservation.getEndTime()
+        );
         try (Statement stmt = databaseConnection.createStatement()) {
             savepoint = databaseConnection.setSavepoint();
             stmt.executeUpdate(query);
@@ -446,13 +467,25 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String firstName = rs.getString("first_name");
                 String lastName = rs.getString("last_name");
                 String creditCardNumber = rs.getString("credit_card_number");
-                YearMonth creditCardExpirationDate = YearMonth.from(rs.getDate("credit_card_expiration_date").toLocalDate());
-                var vehiclesArray = rs.getString("vehicles").replace("{","").replace("}","").split(",");
+                YearMonth creditCardExpirationDate = YearMonth.from(rs
+                    .getDate("credit_card_expiration_date")
+                    .toLocalDate());
+                var vehiclesArray = rs.getString("vehicles").replace("{", "").replace("}", "").split(",");
                 List<Vehicle> vehicles = new ArrayList<>();
-                for(var vehicle : vehiclesArray) {
+                for (var vehicle : vehiclesArray) {
                     vehicles.add(new Vehicle(vehicle));
                 }
-                registeredUsers.add(new Person(id,email,role,oib,firstName,lastName,creditCardNumber,creditCardExpirationDate,vehicles));
+                registeredUsers.add(new Person(
+                    id,
+                    email,
+                    role,
+                    oib,
+                    firstName,
+                    lastName,
+                    creditCardNumber,
+                    creditCardExpirationDate,
+                    vehicles
+                ));
             }
 
             rs = stmt.executeQuery(queryCompany);
@@ -463,7 +496,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String oib = rs.getString("oib");
                 String name = rs.getString("name");
                 String headquarterAddress = rs.getString("headquarter_address");
-                registeredUsers.add(new Company(id,email,role,oib,headquarterAddress,name));
+                registeredUsers.add(new Company(id, email, role, oib, headquarterAddress, name));
             }
             rs = stmt.executeQuery(queryAdministrator);
             while (rs.next()) {
@@ -471,7 +504,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 String email = rs.getString("email");
                 String role = rs.getString("role");
                 String oib = rs.getString("oib");
-                registeredUsers.add(new Administrator(id,email,role,oib));
+                registeredUsers.add(new Administrator(id, email, role, oib));
             }
 
         } catch (SQLException e) {
@@ -590,7 +623,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public void editPerson(String uuid, String firstName, String lastName, String creditCardNumber, String creditCardExpirationDate) {
+    public void editPerson(
+        String uuid,
+        String firstName,
+        String lastName,
+        String creditCardNumber,
+        String creditCardExpirationDate
+    ) {
         Savepoint savepoint = null;
 
         String query = """
@@ -679,10 +718,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
             stmt.setString(4, parkingObjectId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            if(savepoint != null) {
+            if (savepoint != null) {
                 try {
                     databaseConnection.rollback(savepoint);
-                } catch(SQLException e2) {
+                } catch (SQLException e2) {
                     e2.printStackTrace();
                 }
             }

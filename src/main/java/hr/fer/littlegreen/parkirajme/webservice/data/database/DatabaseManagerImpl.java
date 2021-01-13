@@ -11,6 +11,7 @@ import hr.fer.littlegreen.parkirajme.webservice.restapi.addparkingobject.Company
 import hr.fer.littlegreen.parkirajme.webservice.restapi.edit.editparkingobject.EditParkingObjectRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.company.RegisterCompanyRequestBody;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.register.person.RegisterPersonRequestBody;
+import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationAndParkingObjectPair;
 import hr.fer.littlegreen.parkirajme.webservice.restapi.reservations.ReservationRequestBody;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -334,9 +335,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public List<Reservation> getUserParkingReservations(String userId) {
-        List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation where person_uuid = '" + userId + "';";
+    public List<ReservationAndParkingObjectPair> getUserParkingReservations(@NonNull String userId) {
+        List<ReservationAndParkingObjectPair> list = new LinkedList<>();
+        String query = "select * from reservation natural join parking_object where person_uuid = '" + userId + "';";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -351,13 +352,36 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 Timestamp startTime = rs.getTimestamp("start_time");
                 Timestamp endTime = rs.getTimestamp("end_time");
                 String daysOfWeek = rs.getString("days_in_week");
-                list.add(new Reservation(
-                    reservationId,
-                    personId,
-                    parkingId,
-                    startTime,
-                    endTime,
-                    daysOfWeek
+
+                String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
+                String address = rs.getString("address");
+                String name = rs.getString("object_name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+
+                list.add(new ReservationAndParkingObjectPair(
+                    new Reservation(
+                        reservationId,
+                        personId,
+                        parkingId,
+                        startTime,
+                        endTime,
+                        daysOfWeek
+                    ),
+                    new ParkingObject(
+                        parkingId,
+                        companyId,
+                        price,
+                        address,
+                        name,
+                        capacity,
+                        latitude,
+                        longitude,
+                        freeSlots
+                    )
                 ));
             }
         } catch (SQLException e) {
@@ -367,9 +391,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
-    public List<Reservation> getReservationsOnParking(String objectId) {
-        List<Reservation> list = new LinkedList<>();
-        String query = "select * from reservation where object_uuid = " + objectId + ";";
+    public List<ReservationAndParkingObjectPair> getReservationsOnParking(@NonNull String objectId) {
+        List<ReservationAndParkingObjectPair> list = new LinkedList<>();
+        String query = "select * from reservation natural join parking_object where object_uuid = '" + objectId + "';";
         try (
             Statement stmt = databaseConnection.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -384,13 +408,36 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 Timestamp startTime = rs.getTimestamp("start_time");
                 Timestamp endTime = rs.getTimestamp("end_time");
                 String daysOfWeek = rs.getString("days_in_week");
-                list.add(new Reservation(
-                    reservationId,
-                    personId,
-                    parkingId,
-                    startTime,
-                    endTime,
-                    daysOfWeek
+
+                String companyId = rs.getString("company_uuid");
+                int freeSlots = rs.getInt("free_slots");
+                int price = rs.getInt("30_minute_price");
+                int capacity = rs.getInt("capacity");
+                String address = rs.getString("address");
+                String name = rs.getString("object_name");
+                BigDecimal latitude = rs.getBigDecimal("latitude");
+                BigDecimal longitude = rs.getBigDecimal("longitude");
+
+                list.add(new ReservationAndParkingObjectPair(
+                    new Reservation(
+                        reservationId,
+                        personId,
+                        parkingId,
+                        startTime,
+                        endTime,
+                        daysOfWeek
+                    ),
+                    new ParkingObject(
+                        parkingId,
+                        companyId,
+                        price,
+                        address,
+                        name,
+                        capacity,
+                        latitude,
+                        longitude,
+                        freeSlots
+                    )
                 ));
             }
         } catch (SQLException e) {

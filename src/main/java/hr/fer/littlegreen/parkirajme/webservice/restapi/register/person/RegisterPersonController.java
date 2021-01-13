@@ -28,6 +28,7 @@ public class RegisterPersonController {
 
     @PostMapping("/register/person")
     public ResponseEntity<RegisterPersonResponse> regUser(@RequestBody RegisterPersonRequestBody regUserReqBody) {
+        if(regUserReqBody.getRegistrationNumbers().size() == 0) return new ResponseEntity<>(new RegisterPersonResponse(null, null, "Morate navesti barem jedno vozilo"), HttpStatus.CONFLICT);
         try {
             var userId = databaseManager.registerPerson(regUserReqBody);
             var token = tokenManager.generateToken(userId);

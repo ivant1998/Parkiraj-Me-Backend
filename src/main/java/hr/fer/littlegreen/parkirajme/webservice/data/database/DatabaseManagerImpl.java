@@ -90,15 +90,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
                         String lastName = resultSet.getString("last_name");
                         String creditCardNumber = resultSet.getString("credit_card_number");
                         Date creditCardExpirationDate = resultSet.getDate("credit_card_expiration_date");
-                        var vehiclesArray = resultSet
-                            .getString("vehicles")
-                            .replace("{", "")
-                            .replace("}", "")
-                            .split(",");
+                        var vehiclesArray = (String[]) resultSet.getArray("vehicles").getArray();
                         List<Vehicle> vehicles = new ArrayList<>();
                         for (var vehicle : vehiclesArray) {
+                            System.out.print("vehicle: " + vehicle);
                             vehicles.add(new Vehicle(vehicle));
                         }
+
                         return new Person(
                             userUuid,
                             email,
@@ -779,16 +777,26 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     @Override
     public void deleteVehicle(String ownerId, String registrationNumber) {
+        Savepoint savepoint = null;
         String query = """
              BEGIN TRANSACTION;
              DELETE FROM vehicle WHERE person_uuid = ? AND registration_number = ?;
              COMMIT TRANSACTION;
             """;
         try (var stmt = databaseConnection.prepareStatement(query)) {
+            savepoint = databaseConnection.setSavepoint();
             stmt.setString(1, ownerId);
             stmt.setString(2, registrationNumber);
             stmt.executeUpdate();
         } catch (SQLException e) {
+            if(savepoint != null) {
+                try {
+                    databaseConnection.rollback(savepoint);
+                    throw new IllegalArgumentException();
+                } catch (SQLException e2) {
+                    e2.printStackTrace();
+                }
+            }
             e.printStackTrace();
         }
     }

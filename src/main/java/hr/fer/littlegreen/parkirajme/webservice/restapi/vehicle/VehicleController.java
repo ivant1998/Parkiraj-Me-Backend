@@ -37,8 +37,12 @@ public class VehicleController {
     ) {
         var id = tokenManager.getId(token);
         if(id != null && id.equals(userId)) {
-            databaseManager.deleteVehicle(id, registrationNumber);
-            return HttpStatus.OK;
+            try {
+                databaseManager.deleteVehicle(id, registrationNumber);
+                return HttpStatus.OK;
+            } catch (IllegalArgumentException ex) {
+                return HttpStatus.BAD_REQUEST;
+            }
         }
         return HttpStatus.UNAUTHORIZED;
 

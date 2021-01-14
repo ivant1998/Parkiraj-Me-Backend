@@ -27,7 +27,6 @@ public class Simulator {
             try(PreparedStatement stmt = databaseConnection.prepareStatement(sql)) {
                 savepoint = databaseConnection.setSavepoint();
                 stmt.executeUpdate();
-                System.out.println("ispravno");
             } catch (SQLException ex) {
                 if (savepoint != null) {
                     try {

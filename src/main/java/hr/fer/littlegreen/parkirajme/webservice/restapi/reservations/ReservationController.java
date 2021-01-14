@@ -1,6 +1,7 @@
 package hr.fer.littlegreen.parkirajme.webservice.restapi.reservations;
 
 import hr.fer.littlegreen.parkirajme.webservice.data.database.DatabaseManager;
+import hr.fer.littlegreen.parkirajme.webservice.domain.models.ParkingObject;
 import hr.fer.littlegreen.parkirajme.webservice.domain.session.TokenManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,8 @@ public class ReservationController {
         if (userId != null) {
             try {
                 String id = databaseManager.addReservation(reservation, userId);
+                ParkingObject obj = databaseManager.getParkingObject(reservation.getParkingId());
+                if (obj.getFreeSlots() <= 0) { return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);}
                 if (id != null) { return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK); }
             } catch (IllegalArgumentException ex) {
                 return new ResponseEntity<>(null, HttpStatus.CONFLICT);

@@ -85,10 +85,10 @@ public class ReservationController {
             try {
                 String id = databaseManager.addReservation(reservation, userId);
                 ParkingObject obj = databaseManager.getParkingObject(reservation.getParkingId());
-                if (obj.getFreeSlots() <= 0) { return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);}
+                if (obj.getFreeSlots() <= 0) { return new ResponseEntity<>(null, HttpStatus.CONFLICT);}
                 if (id != null) { return new ResponseEntity<>(new ReservationResponse(id), HttpStatus.OK); }
             } catch (IllegalArgumentException ex) {
-                return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

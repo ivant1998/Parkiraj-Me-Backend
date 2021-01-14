@@ -42,4 +42,20 @@ class TokenManagerImplTest {
     void getIdFailureTest() {
         assertNull(tokenManager.getId("token"));
     }
+
+    @Test
+    void deleteByTokenTest() {
+        var token = tokenManager.generateToken("123");
+        assertEquals("123", tokenManager.getId(token));
+        tokenManager.removeByToken(token);
+        assertNull(tokenManager.getId(token));
+    }
+
+    @Test
+    void deleteByIdTest() {
+        var token = tokenManager.generateToken("id_456");
+        assertEquals("id_456", tokenManager.getId(token));
+        tokenManager.removeById("id_456");
+        assertNull(tokenManager.getId(token));
+    }
 }

@@ -50,7 +50,7 @@ public class GetClosestParkingObjectController {
     }
 
     private double getDistanceFromLatLonInKm(BigDecimal latitude, BigDecimal longitude, ParkingObject object) {
-        var R = 6731;
+        var R = 6371;
         var dLat = toRadians(object.getLatitude().doubleValue() - latitude.doubleValue());
         var dLong = toRadians(object.getLongitude().doubleValue() - longitude.doubleValue());
         var a = sin(dLat / 2) * sin(dLat / 2) + cos(toRadians(latitude.doubleValue())) *
